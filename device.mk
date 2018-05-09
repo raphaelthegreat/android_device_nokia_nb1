@@ -33,7 +33,8 @@ DEVICE_PACKAGE_OVERLAYS += \
 
 # Fingerprint
 PRODUCT_PACKAGES += \
-    android.hardware.biometrics.fingerprint@2.1-service.nokia_nb1
+    android.hardware.biometrics.fingerprint@2.1-service.nokia_nb1 \
+    libstdc++.vendor
 
 # Keylayout
 PRODUCT_COPY_FILES += \
