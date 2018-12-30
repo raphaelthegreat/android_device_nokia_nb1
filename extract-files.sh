@@ -14,6 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# If we're being sourced by the common script that we called,
+# stop right here. No need to go down the rabbit hole.
+if [ "${BASH_SOURCE[0]}" != "${0}" ]; then
+    return
+fi
+
 set -e
 
 export DEVICE=NB1
@@ -21,4 +27,4 @@ export DEVICE_COMMON=msm8998-common
 export VENDOR=nokia
 export DEVICE_BRINGUP_YEAR=2019
 
-./../../$VENDOR/$DEVICE_COMMON/extract-files.sh $@
+"./../../${VENDOR}/${DEVICE_COMMON}/extract-files.sh" "$@"
