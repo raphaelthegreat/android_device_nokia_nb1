@@ -33,7 +33,6 @@ DEVICE_PACKAGE_OVERLAYS += \
 # Fingerprint
 PRODUCT_PACKAGES += \
     android.hardware.biometrics.fingerprint@2.1-service.nokia_nb1 \
-    libshims_gxfpd \
     libunwind-vendor \
     libbacktrace-vendor
 
@@ -41,6 +40,11 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayout/goodix_fp.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/goodix_fp.kl \
     $(LOCAL_PATH)/keylayout/gpio-keys.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/gpio-keys.kl
+
+# Shims
+PRODUCT_PACKAGES += \
+    libshims_gxfpd \
+    libshims_camera
 
 # Ramdisk
 PRODUCT_PACKAGES += \

@@ -39,7 +39,8 @@ TARGET_KERNEL_VERSION := 4.4
 
 # Shims
 TARGET_LD_SHIM_LIBS := \
-   /vendor/bin/gx_fpd|libshims_gxfpd.so
+   /vendor/bin/gx_fpd|libshims_gxfpd.so \
+   /vendor/lib/hw/camera.msm8998.so|libshims_camera.so
 
 # Partitions
 BOARD_BOOTIMAGE_PARTITION_SIZE := 67108864
