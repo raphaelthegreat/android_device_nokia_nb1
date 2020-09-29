@@ -393,7 +393,6 @@ vendor/firmware/leia_pm4_470.fw
 vendor/firmware/libpn548ad_fw.so
 
 # NFC (NXP)
-vendor/bin/nqnfcinfo
 vendor/lib/libpn547_fw.so	
 vendor/lib/libpn548ad_fw.so	
 vendor/lib/libpn551_fw.so	
