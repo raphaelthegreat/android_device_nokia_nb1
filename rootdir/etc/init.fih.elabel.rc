@@ -1,0 +1,6 @@
+on fs
+# mount elabel
+	mount ext4 /dev/block/bootdevice/by-name/elabel /elabel nosuid nodev noatime barrier=1
+	chown system system /elabel
+    restorecon_recursive /elabel
+

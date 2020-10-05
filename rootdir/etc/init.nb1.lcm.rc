@@ -1,0 +1,53 @@
+on post-fs-data
+	rm /data/vendor/display/qdcm_calib_data_LGD_Dual_DSI_cmd_mode_panel_without_DSC.xml
+	rm /data/vendor/display/qdcm_calib_data_JDI_Dual_nt36850_cmd_mode_dsi_panel_without_DSC.xml
+	rm /data/vendor/display/disp_user_calib_data_JDI_Dual_nt36850_cmd_mode_dsi_panel_without_DSC.xml
+	rm /data/vendor/display/disp_user_calib_data_LGD_Dual_DSI_cmd_mode_panel_without_DSC.xml
+
+on boot
+	chown system system /proc/AllHWList/LCM0
+	chown system system /proc/AllHWList/LCM0/AOD
+	chown system system /proc/AllHWList/LCM0/PanelID
+	chown system system /proc/AllHWList/LCM0/setlp
+	chown system system /sys/class/graphics/fb0/blank
+	chown system system /proc/AllHWList/LCM0/glance
+	chmod 777 /proc/AllHWList/LCM0
+	chmod 664 /proc/AllHWList/LCM0/AOD
+	chmod 644 /proc/AllHWList/LCM0/PanelID
+	chmod 664 /proc/AllHWList/LCM0/setlp
+	chmod 664 /proc/AllHWList/LCM0/glance
+
+	chown system system /proc/AllHWList/LCM0/awer_cnt
+	chown system system /proc/AllHWList/LCM0/awer_status
+	chmod 664 /proc/AllHWList/LCM0/awer_cnt
+	chmod 664 /proc/AllHWList/LCM0/awer_status
+
+on property:sys.boot_completed=1
+	start qdcm_script
+
+on property:sys.qdcm.loadxml=1
+	copy /vendor/bin/qdcm_calib_data_LGD_Dual_DSI_cmd_mode_panel_without_DSC.xml /data/vendor/display/qdcm_calib_data_LGD_Dual_DSI_cmd_mode_panel_without_DSC.xml
+	chown system system /data/vendor/display/qdcm_calib_data_LGD_Dual_DSI_cmd_mode_panel_without_DSC.xml
+	chmod 664 /data/vendor/display/qdcm_calib_data_LGD_Dual_DSI_cmd_mode_panel_without_DSC.xml
+	copy /vendor/bin/qdcm_calib_data_JDI_Dual_nt36850_cmd_mode_dsi_panel_without_DSC.xml /data/vendor/display/qdcm_calib_data_JDI_Dual_nt36850_cmd_mode_dsi_panel_without_DSC.xml
+	chown system system /data/vendor/display/qdcm_calib_data_JDI_Dual_nt36850_cmd_mode_dsi_panel_without_DSC.xml
+	chmod 664 /data/vendor/display/qdcm_calib_data_JDI_Dual_nt36850_cmd_mode_dsi_panel_without_DSC.xml
+
+on property:sys.qdcm.configxml=1
+	chown system system /data/vendor/display/qdcm_calib_data_LGD_Dual_DSI_cmd_mode_panel_without_DSC.xml
+	chmod 664 /data/vendor/display/qdcm_calib_data_LGD_Dual_DSI_cmd_mode_panel_without_DSC.xml
+	chown system system /data/vendor/display/qdcm_calib_data_JDI_Dual_nt36850_cmd_mode_dsi_panel_without_DSC.xml
+	chmod 664 /data/vendor/display/qdcm_calib_data_JDI_Dual_nt36850_cmd_mode_dsi_panel_without_DSC.xml
+
+on property:persist.qdcm.uninstall=1
+	rm /data/vendor/display/qdcm_calib_data_LGD_Dual_DSI_cmd_mode_panel_without_DSC.xml
+	rm /data/vendor/display/qdcm_calib_data_JDI_Dual_nt36850_cmd_mode_dsi_panel_without_DSC.xml
+	rm /data/vendor/display/disp_user_calib_data_JDI_Dual_nt36850_cmd_mode_dsi_panel_without_DSC.xml
+	rm /data/vendor/display/disp_user_calib_data_LGD_Dual_DSI_cmd_mode_panel_without_DSC.xml
+
+service qdcm_script /vendor/bin/sh /vendor/bin/init.nb1.lcm.sh
+   disabled
+   class main
+   user root
+   group shell
+   oneshot

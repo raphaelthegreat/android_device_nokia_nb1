@@ -1,0 +1,81 @@
+on init
+	setprop persist.camera.FIH_FTM 0
+	setprop persist.vendor.camera.HAL3.enabled 1
+	setprop persist.camera.HAL3.enabled 1
+	setprop persist.vendor.camera.ois.disable 0
+	setprop persist.vendor.ois.disable 0
+	setprop persist.camera.hdr_level 1.5
+	setprop camera.mono_only 1
+	setprop persist.camera.ffcolor ffdfbe
+	setprop camera.hdr.tone.main 25
+	setprop camera.hdr.bright.main 0
+	setprop camera.hdr.sat.main 0
+	setprop camera.hdr.perf.main 2
+	setprop camera.hdr.tone.front 25
+	setprop camera.hdr.bright.front 0
+	setprop camera.hdr.sat.front 0
+	setprop camera.hdr.perf.front 2
+	#force HAL1 for below packages,[PL2O-4926][Camera]Camera is confused when record video in the com.dw.btime APK
+	setprop camera.hal1.packagelist com.dw.btime
+
+on boot
+    # /* MM-AL-RangeFinderPorting-04*{ */
+    chown system camera /sys/kernel/range/enable_ps_sensor
+    chmod 0660 /sys/kernel/range/enable_ps_sensor
+    chown system camera /sys/kernel/range/set_delay_ms
+    chmod 0660 /sys/kernel/range/set_delay_ms
+    chown system camera /sys/kernel/range/cal_offset
+    chmod 0660 /sys/kernel/range/cal_offset
+    chown system camera /sys/kernel/range/cal_xtalk
+    chmod 0660 /sys/kernel/range/cal_xtalk
+    ##chown system camera /sys/class/input/input5/enable_ps_sensor
+    ##chmod 0660 /sys/class/input/input5/enable_ps_sensor
+    # /* MM-AL-RangeFinderPorting-04*} */
+    # /* MM-AL-AddSEPolicyForCalibLoad-00+{ */
+    chown system camera /sys/kernel/range/cal_data
+    chmod 0220 /sys/kernel/range/cal_data
+    # /* MM-AL-AddSEPolicyForCalibLoad-00+} */
+    chown system camera /sys/kernel/range/do_flush
+    chmod 0660 /sys/kernel/range/do_flush
+    # /* MM-AL-AddForFQC-00+{ */
+    chown system camera /sys/kernel/range/show_distance
+    chmod 0660 /sys/kernel/range/show_distance
+    # /* MM-AL-AddForFQC-00+} */
+
+    # /* MM-AL-LoadOISGyroCal-00+{ */
+    chown system system /sys/kernel/ois_control/gyro_cal
+    chmod 0660 /sys/kernel/ois_control/gyro_cal
+    # /* MM-AL-LoadOISGyroCal-00+} */
+
+on post-fs-data
+    # /* MM-AL-AddSEPolicyForCalibLoad-00+{ */
+    start rf_calbd
+    # /* MM-AL-AddSEPolicyForCalibLoad-00+{ */
+
+    # /* MM-AL-AddSEPolicyForCalibLoad-00+{ */
+    start oisgyro_calbd
+    # /* MM-AL-AddSEPolicyForCalibLoad-00+{ */
+
+# /* MM-AL-AddSEPolicyForCalibLoad-00+{ */
+service rf_calbd /system/bin/toybox dd if=/dev/block/bootdevice/by-name/deviceinfo of=/sys/kernel/range/cal_data ibs=16 obs=16 skip=32000 count=1
+	class main
+	user root
+	group system camera
+	oneshot
+	disabled
+# /* MM-AL-AddSEPolicyForCalibLoad-00+{ */
+
+# /* MM-AL-LoadOISGyroCal-00+{ */
+service oisgyro_calbd /system/bin/toybox dd if=/dev/block/bootdevice/by-name/deviceinfo of=/sys/kernel/ois_control/gyro_cal ibs=16 obs=16 skip=2560 count=1
+	class main
+	user root
+	group system system
+	oneshot
+	disabled
+# /* MM-AL-LoadOISGyroCal-00+{ */
+
+#MM-MC-ModifyExifForModelAndMake-00+{
+on property:ro.product.nickname=*
+	setprop persist.vendor.sys.exif.model ${ro.product.nickname}
+	setprop persist.sys.exif.model ${ro.product.nickname}
+#MM-MC-ModifyExifForModelAndMake-00+}

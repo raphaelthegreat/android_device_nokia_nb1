@@ -1,0 +1,8 @@
+on boot
+    chown system system /sys/class/power_supply/battery/input_suspend
+    chmod 0664 /sys/class/power_supply/battery/input_suspend
+    restorecon /sys/class/power_supply/battery/input_suspend
+
+# FIHTDC, Diable thermal balance and CTM(Connect Temperature Monitor)
+    setprop persist.therm_bal.disallowed 1
+    setprop persist.ctm.disallowed 1
