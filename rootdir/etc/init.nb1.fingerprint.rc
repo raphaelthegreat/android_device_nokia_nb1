@@ -10,7 +10,7 @@ on init
 on post-fs-data
     mkdir /data/system/fingerprint 0770 system system
 
-service gx_fpd /vendor/bin/gx_fpd
+service gx_fpd /system/bin/gx_fpd
     class main
     user system
     group system
