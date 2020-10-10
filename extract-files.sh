@@ -19,6 +19,6 @@ set -e
 export DEVICE=NB1
 export DEVICE_COMMON=msm8998-common
 export VENDOR=nokia
-export DEVICE_BRINGUP_YEAR=2017
+export DEVICE_BRINGUP_YEAR=2019
 
 ./../../$VENDOR/$DEVICE_COMMON/extract-files.sh $@

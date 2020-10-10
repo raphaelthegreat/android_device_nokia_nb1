@@ -1,3 +1,6 @@
+## NB1 proprietary files
+## From Nokia/NB1_00WW_FIH/NB1:9/PPR1.180610.011/00WW_5_15J:user/release-keys unless pinned
+
 # Audio ACDB
 vendor/etc/acdbdata/NB1/Bluetooth_cal.acdb
 vendor/etc/acdbdata/NB1/General_cal.acdb
@@ -12,14 +15,10 @@ vendor/etc/acdbdata/NB1/workspaceFile.qwsp
 etc/firmware/tfa98xx.cnt:vendor/firmware/tfa98xx.cnt
 etc/firmware/tfa98xxEVT.cnt:vendor/firmware/tfa98xxEVT.cnt
 
-# Alipay - from A1N QKQ1.190828.002
-vendor/lib/libteeclientjni.so|bb03671ea53b71eb433d2739c91801f2424ab9a2
-vendor/lib64/libteeclientjni.so|e183d78e64803e5ccfe00c4028fe6f6ab41cdc48
-framework/org.ifaa.android.manager.jar|27e3d7e0d74b6ae187aa4fdd59a30a871735c1ad
-
-# IFAA - from A1N QKQ1.190828.002
-vendor/lib/vendor.fih.hardware.ifaa@1.0.so|853a7d8f2fd5e60a5c480f2f0491847540b7912b
-vendor/lib64/vendor.fih.hardware.ifaa@1.0.so|75c7269727f2ec334bb752958ec09ebaba8dab19
+# Display (Configs)
+vendor/bin/qca6234-service.sh
+vendor/bin/qdcm_calib_data_JDI_Dual_nt36850_cmd_mode_dsi_panel_without_DSC.xml
+vendor/bin/qdcm_calib_data_LGD_Dual_DSI_cmd_mode_panel_without_DSC.xml
 
 # Display (Firmware)
 vendor/firmware/TP_Firmware_JDI
@@ -30,7 +29,6 @@ vendor/bin/mm-qcamera-app
 vendor/lib/hw/camera.msm8998.so
 vendor/lib/libdepthmapwrapper.so
 vendor/lib/libflash_pmic.so
-vendor/lib/libgui_vendor.so
 vendor/lib/libhal_dbg.so
 vendor/lib/libjpegdhw.so
 vendor/lib/libjpegdmahw.so
@@ -39,7 +37,6 @@ vendor/lib/libmm-qcamera.so
 vendor/lib/libmmjpeg.so
 vendor/lib/libmmjpeg_interface.so
 vendor/lib/libmmlib2d_interface.so
-vendor/lib/libmmcamera_interface.so
 vendor/lib/libmmqjpegdma.so
 vendor/lib/libmmqjpeg_codec.so
 vendor/lib/libmpbase.so
@@ -50,8 +47,10 @@ vendor/lib/libqomx_jpegenc_pipe.so
 vendor/lib/libremosaic_daemon.so
 vendor/lib/libvideoutils.so
 vendor/lib64/libvideoutils.so
-lib/vendor.qti.hardware.camera.device@1.0.so:vendor/lib/vendor.qti.hardware.camera.device@1.0.so
-lib64/vendor.qti.hardware.camera.device@1.0.so:vendor/lib64/vendor.qti.hardware.camera.device@1.0.so
+
+# Camera (Arcsoft)
+vendor/lib/libarcsoft_beautyshot.so
+vendor/lib/libarcsoft_beautyshot_video_algorithm.so
 
 # Camera (Sensors)
 vendor/lib/libmmcamera_bokeh.so
@@ -524,8 +523,6 @@ etc/firmware/cppf.mdt:vendor/firmware/cppf.mdt
 # Fingerprint sensor
 vendor/bin/gx_fpd
 vendor/bin/gx_fpcmd
-vendor/bin/hw/android.hardware.biometrics.fingerprint@2.1-service
-vendor/lib64/hw/fingerprint.default.so
 vendor/lib64/hw/gxfingerprint.default.so
 vendor/lib64/libfp_client.so
 vendor/lib64/libfpservice.so
@@ -562,8 +559,6 @@ vendor/lib/libpn553_fw.so
 vendor/lib/libpn557_fw.so
 
 # NFC (Samsung)
-etc/nqnfcee_access.xml
-etc/nqnfcse_access.xml
 vendor/bin/hw/vendor.nxp.hardware.nfc@1.1-service
 vendor/etc/permissions/com.android.nfc_extras.xml
 vendor/etc/permissions/com.nxp.mifare.xml
@@ -573,15 +568,15 @@ vendor/lib64/nfc_nci.nqx.default.hw.so
 vendor/lib64/hw/nfc_nci.nqx.default.so
 
 # Widevine (Firmware)
-etc/firmware/widevine.b00:etc/firmware/widevine.b00
-etc/firmware/widevine.b01:etc/firmware/widevine.b01
-etc/firmware/widevine.b02:etc/firmware/widevine.b02
-etc/firmware/widevine.b03:etc/firmware/widevine.b03
-etc/firmware/widevine.b04:etc/firmware/widevine.b04
-etc/firmware/widevine.b05:etc/firmware/widevine.b05
-etc/firmware/widevine.b06:etc/firmware/widevine.b06
-etc/firmware/widevine.b07:etc/firmware/widevine.b07
-etc/firmware/widevine.mdt:etc/firmware/widevine.mdt
+etc/firmware/widevine.b00:vendor/firmware/widevine.b00
+etc/firmware/widevine.b01:vendor/firmware/widevine.b01
+etc/firmware/widevine.b02:vendor/firmware/widevine.b02
+etc/firmware/widevine.b03:vendor/firmware/widevine.b03
+etc/firmware/widevine.b04:vendor/firmware/widevine.b04
+etc/firmware/widevine.b05:vendor/firmware/widevine.b05
+etc/firmware/widevine.b06:vendor/firmware/widevine.b06
+etc/firmware/widevine.b07:vendor/firmware/widevine.b07
+etc/firmware/widevine.mdt:vendor/firmware/widevine.mdt
 
 # Widevine
 vendor/lib/mediadrm/libwvdrmengine.so
