@@ -46,8 +46,9 @@ PRODUCT_PACKAGES += \
     init.nb1.lcm.sh \
     init.nb1.smartamp_init.sh
 
-# Fix gx_fpd missing libbacktrace and libunwind
+# Fingerprint
 PRODUCT_PACKAGES += \
+    libshims_gxfpd \
     libunwind-vendor \
     libbacktrace-vendor
 
