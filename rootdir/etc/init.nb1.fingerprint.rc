@@ -1,16 +1,14 @@
 on boot
-    chown system system /dev/goodix_fp
-    chmod 0644 /dev/goodix_fp
+    setprop sys.fp.navigation.enable 1
 
-on init
-    setprop persist.fp.navigation 1
-    setprop persist.close.keymaster 1
-    #setprop persist.enable.esd 1
+on fs
+    chown system system /dev/goodix_fp
+    chmod 666 /dev/goodix_fp
 
 on post-fs-data
     mkdir /data/system/fingerprint 0770 system system
 
-service gx_fpd /vendor/bin/gx_fpd
+service gx_fpd /system/bin/gx_fpd
     class main
     user system
     group system
@@ -23,7 +21,9 @@ on property:sys.fih.fingerprint=false
 
 on property:ro.boot.gxfp_lv=true
     setprop sys.gxfp.lv 1
-
+    
 on property:sys.boot_completed=1
     restorecon_recursive /data/system/fingerprint/
 
+on property:vendor.gxfp.version=*
+    setprop vendor.fp.firmware.version  Goodix-${vendor.gxfp.version}

@@ -47,6 +47,7 @@ vendor/lib/libqomx_jpegenc_pipe.so
 vendor/lib/libremosaic_daemon.so
 vendor/lib/libvideoutils.so
 vendor/lib64/libvideoutils.so
+lib/libgui.so:vendor/lib/libgui.so
 
 # Camera (Arcsoft)
 vendor/lib/libarcsoft_beautyshot.so
@@ -527,8 +528,9 @@ vendor/lib64/hw/gxfingerprint.default.so
 vendor/lib64/libfp_client.so
 vendor/lib64/libfpservice.so
 vendor/lib64/libfpjni.so
-vendor/bin/qfp-daemon
+vendor/bin/qfp-daemon 
 vendor/lib64/libqfp-service.so
+vendor/lib64/hw/fingerprint.default.so:vendor/lib64/hw/fingerprint.msm8998.so
 
 # Fingerprint (Firmware)
 etc/firmware/goodixfp.b00:vendor/firmware/goodixfp.b00
@@ -540,7 +542,6 @@ etc/firmware/goodixfp.b05:vendor/firmware/goodixfp.b05
 etc/firmware/goodixfp.b06:vendor/firmware/goodixfp.b06
 etc/firmware/goodixfp.b07:vendor/firmware/goodixfp.b07
 etc/firmware/goodixfp.mdt:vendor/firmware/goodixfp.mdt
-
 etc/firmware/goodixfplv.b00:vendor/firmware/goodixfplv.b00
 etc/firmware/goodixfplv.b01:vendor/firmware/goodixfplv.b01
 etc/firmware/goodixfplv.b02:vendor/firmware/goodixfplv.b02

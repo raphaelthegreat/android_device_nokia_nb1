@@ -46,5 +46,10 @@ PRODUCT_PACKAGES += \
     init.nb1.lcm.sh \
     init.nb1.smartamp_init.sh
 
+# Fix gx_fpd missing libbacktrace and libunwind
+PRODUCT_PACKAGES += \
+    libunwind-vendor \
+    libbacktrace-vendor
+
 # Get non-open-source specific aspects
 $(call inherit-product, vendor/nokia/NB1/NB1-vendor.mk)
