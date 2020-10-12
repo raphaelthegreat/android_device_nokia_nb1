@@ -525,7 +525,7 @@ etc/firmware/cppf.mdt:vendor/firmware/cppf.mdt
 vendor/bin/gx_fpd
 vendor/bin/gx_fpcmd
 vendor/lib64/hw/gxfingerprint.default.so
-vendor/lib64/libfp_client.so
+vendor/lib64/libfp_client.so|a132bbbde9ef7aac598fd314c087272dd474ded1
 vendor/lib64/libfpservice.so
 vendor/lib64/libfpjni.so
 vendor/bin/qfp-daemon 
