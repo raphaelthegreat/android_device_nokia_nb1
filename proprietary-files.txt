@@ -26,7 +26,6 @@ vendor/firmware/TP_Firmware_LG4946
 
 # Camera HAL
 vendor/bin/mm-qcamera-app
-vendor/lib/hw/camera.msm8998.so
 vendor/lib/libdepthmapwrapper.so
 vendor/lib/libflash_pmic.so
 vendor/lib/libhal_dbg.so

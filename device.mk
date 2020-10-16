@@ -46,11 +46,15 @@ PRODUCT_PACKAGES += \
     init.nb1.lcm.sh \
     init.nb1.smartamp_init.sh
 
-# Fingerprint
+# Fingerprint VNDK
 PRODUCT_PACKAGES += \
     libshims_gxfpd \
     libunwind-vendor \
     libbacktrace-vendor
+
+# Camera
+PRODUCT_PACKAGES += \
+    camera.msm8998
 
 # Get non-open-source specific aspects
 $(call inherit-product, vendor/nokia/NB1/NB1-vendor.mk)
