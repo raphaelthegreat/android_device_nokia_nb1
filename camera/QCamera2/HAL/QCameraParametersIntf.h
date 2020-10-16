@@ -52,7 +52,7 @@ class QCameraAdjustFPS
 public:
     virtual int recalcFPSRange(int &minFPS, int &maxFPS,
             const float &minVideoFPS, const float &maxVideoFPs,
-            cam_fps_range_t &adjustedRange, bool bRecordingHint) = 0;
+            cam_fps_range_t &adjustedRange) = 0;
     virtual ~QCameraAdjustFPS() {}
 };
 
@@ -236,7 +236,7 @@ public:
     int32_t configureAEBracketing(cam_capture_frame_config_t &frame_config);
     int32_t configureHDRBracketing(cam_capture_frame_config_t &frame_config);
     int32_t configFrameCapture(bool commitSettings);
-    int32_t resetFrameCapture(bool commitSettings, bool lowLightEnabled);
+    int32_t resetFrameCapture(bool commitSettings);
     cam_still_more_t getStillMoreSettings();
     void setStillMoreSettings(cam_still_more_t stillmore_config);
     cam_still_more_t getStillMoreCapability();

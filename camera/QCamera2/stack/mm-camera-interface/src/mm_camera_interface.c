@@ -57,12 +57,9 @@ static mm_camera_ctrl_t g_cam_ctrl;
 static pthread_mutex_t g_handler_lock = PTHREAD_MUTEX_INITIALIZER;
 static uint16_t g_handler_history_count = 0; /* history count for handler */
 
-// 16th (starting from 0) bit tells its a BACK or FRONT camera
-#define CAM_SENSOR_FACING_MASK (1U<<16)
-// 24th (starting from 0) bit tells its a MAIN or AUX camera
-#define CAM_SENSOR_TYPE_MASK (1U<<24)
-// 25th (starting from 0) bit tells its YUV sensor or not
-#define CAM_SENSOR_FORMAT_MASK (1U<<25)
+#define CAM_SENSOR_FACING_MASK (1U<<16) // 16th (starting from 0) bit tells its a BACK or FRONT camera
+#define CAM_SENSOR_TYPE_MASK (1U<<24)   // 24th (starting from 0) bit tells its a MAIN or AUX camera
+#define CAM_SENSOR_FORMAT_MASK (1U<<25) // 25th (starting from 0) bit tells its YUV sensor or not
 
 /*===========================================================================
  * FUNCTION   : mm_camera_util_generate_handler
@@ -612,41 +609,6 @@ static int32_t mm_camera_intf_qbuf(uint32_t camera_handle,
     LOGD("X evt_type = %d",rc);
     return rc;
 }
-
-/*===========================================================================
- * FUNCTION   : mm_camera_intf_qbuf
- *
- * DESCRIPTION: enqueue buffer back to kernel
- *
- * PARAMETERS :
- *   @camera_handle: camera handle
- *   @ch_id        : channel handle
- *   @buf          : buf ptr to be enqueued
- *
- * RETURN     : int32_t type of status
- *              0  -- success
- *              -1 -- failure
- *==========================================================================*/
-static int32_t mm_camera_intf_cancel_buf(uint32_t camera_handle, uint32_t ch_id, uint32_t stream_id,
-                     uint32_t buf_idx)
-{
-    int32_t rc = -1;
-    mm_camera_obj_t * my_obj = NULL;
-
-    pthread_mutex_lock(&g_intf_lock);
-    my_obj = mm_camera_util_get_camera_by_handler(camera_handle);
-
-    if(my_obj) {
-        pthread_mutex_lock(&my_obj->cam_lock);
-        pthread_mutex_unlock(&g_intf_lock);
-        rc = mm_camera_cancel_buf(my_obj, ch_id, stream_id, buf_idx);
-    } else {
-        pthread_mutex_unlock(&g_intf_lock);
-    }
-    LOGD("X evt_type = %d",rc);
-    return rc;
-}
-
 
 /*===========================================================================
  * FUNCTION   : mm_camera_intf_get_queued_buf_count
@@ -1630,9 +1592,7 @@ void get_sensor_info()
 void sort_camera_info(int num_cam)
 {
     int idx = 0, i;
-    int8_t is_yuv_aux_cam_exposed = 0;
-    char prop[PROPERTY_VALUE_MAX];
-    struct xiaomi_camera_info temp_info[MM_CAMERA_MAX_NUM_SENSORS];
+    struct camera_info temp_info[MM_CAMERA_MAX_NUM_SENSORS];
     cam_sync_type_t temp_type[MM_CAMERA_MAX_NUM_SENSORS];
     cam_sync_mode_t temp_mode[MM_CAMERA_MAX_NUM_SENSORS];
     uint8_t temp_is_yuv[MM_CAMERA_MAX_NUM_SENSORS];
@@ -1644,18 +1604,9 @@ void sort_camera_info(int num_cam)
     memset(temp_mode, 0, sizeof(temp_mode));
     memset(temp_is_yuv, 0, sizeof(temp_is_yuv));
 
-    // Signifies whether YUV AUX camera has to be exposed as physical camera
-    memset(prop, 0, sizeof(prop));
-    property_get("persist.camera.aux.yuv", prop, "0");
-    is_yuv_aux_cam_exposed = atoi(prop);
-    LOGI("YUV Aux camera exposed %d",is_yuv_aux_cam_exposed);
+    /* TODO: Need to revisit this logic if front AUX is available. */
 
-    /* Order of the camera exposed is
-    Back main, Front main, Back Aux and then Front Aux.
-    It is because that lot of 3rd party cameras apps
-    blindly assume 0th is Back and 1st is front */
-
-    /* Firstly save the main back cameras info */
+    /* firstly save the main back cameras info*/
     for (i = 0; i < num_cam; i++) {
         if ((g_cam_ctrl.info[i].facing == CAMERA_FACING_BACK) &&
             (g_cam_ctrl.cam_type[i] != CAM_TYPE_AUX)) {
@@ -1669,10 +1620,24 @@ void sort_camera_info(int num_cam)
         }
     }
 
-    /* Save the main front cameras info */
+    /* save the aux back cameras info*/
+    for (i = 0; i < num_cam; i++) {
+        if ((g_cam_ctrl.info[i].facing == CAMERA_FACING_BACK) &&
+                (g_cam_ctrl.cam_type[i] == CAM_TYPE_AUX)) {
+            temp_info[idx] = g_cam_ctrl.info[i];
+            temp_type[idx] = g_cam_ctrl.cam_type[i];
+            temp_mode[idx] = g_cam_ctrl.cam_mode[i];
+            temp_is_yuv[idx] = g_cam_ctrl.is_yuv[i];
+            LOGD("Found Back Aux Camera: i: %d idx: %d", i, idx);
+            memcpy(temp_dev_name[idx++],g_cam_ctrl.video_dev_name[i],
+                    MM_CAMERA_DEV_NAME_LEN);
+        }
+    }
+
+    /* then save the front cameras info*/
     for (i = 0; i < num_cam; i++) {
         if ((g_cam_ctrl.info[i].facing == CAMERA_FACING_FRONT) &&
-            (g_cam_ctrl.cam_type[i] != CAM_TYPE_AUX)) {
+                (g_cam_ctrl.cam_type[i] != CAM_TYPE_AUX)) {
             temp_info[idx] = g_cam_ctrl.info[i];
             temp_type[idx] = g_cam_ctrl.cam_type[i];
             temp_mode[idx] = g_cam_ctrl.cam_mode[i];
@@ -1683,28 +1648,11 @@ void sort_camera_info(int num_cam)
         }
     }
 
-    /* Expose YUV AUX camera if persist.camera.aux.yuv is set to 1.
-    Otherwsie expose AUX camera if it is not YUV. */
-    for (i = 0; i < num_cam; i++) {
-        if ((g_cam_ctrl.info[i].facing == CAMERA_FACING_BACK) &&
-                (g_cam_ctrl.cam_type[i] == CAM_TYPE_AUX) &&
-                (is_yuv_aux_cam_exposed || !(g_cam_ctrl.is_yuv[i]))) {
-            temp_info[idx] = g_cam_ctrl.info[i];
-            temp_type[idx] = g_cam_ctrl.cam_type[i];
-            temp_mode[idx] = g_cam_ctrl.cam_mode[i];
-            temp_is_yuv[idx] = g_cam_ctrl.is_yuv[i];
-            LOGD("Found back Aux Camera: i: %d idx: %d", i, idx);
-            memcpy(temp_dev_name[idx++],g_cam_ctrl.video_dev_name[i],
-                MM_CAMERA_DEV_NAME_LEN);
-        }
-    }
-
-    /* Expose YUV AUX camera if persist.camera.aux.yuv is set to 1.
-    Otherwsie expose AUX camera if it is not YUV. */
+    //TODO: Need to revisit this logic if front AUX is available.
+    /* save the aux front cameras info*/
     for (i = 0; i < num_cam; i++) {
         if ((g_cam_ctrl.info[i].facing == CAMERA_FACING_FRONT) &&
-                (g_cam_ctrl.cam_type[i] == CAM_TYPE_AUX) &&
-                (is_yuv_aux_cam_exposed || !(g_cam_ctrl.is_yuv[i]))) {
+            (g_cam_ctrl.cam_type[i] == CAM_TYPE_AUX)) {
             temp_info[idx] = g_cam_ctrl.info[i];
             temp_type[idx] = g_cam_ctrl.cam_type[i];
             temp_mode[idx] = g_cam_ctrl.cam_mode[i];
@@ -1985,8 +1933,7 @@ static int32_t mm_camera_intf_register_stream_buf_cb(uint32_t camera_handle,
 struct camera_info *get_cam_info(uint32_t camera_id, cam_sync_type_t *pCamType)
 {
     *pCamType = g_cam_ctrl.cam_type[camera_id];
-    //HACK to get proper structure from xiaomi one
-    return (struct camera_info*)(&g_cam_ctrl.info[camera_id]);
+    return &g_cam_ctrl.info[camera_id];
 }
 
 uint8_t is_yuv_sensor(uint32_t camera_id)
@@ -2017,7 +1964,6 @@ static mm_camera_ops_t mm_camera_ops = {
     .delete_stream = mm_camera_intf_del_stream,
     .config_stream = mm_camera_intf_config_stream,
     .qbuf = mm_camera_intf_qbuf,
-    .cancel_buffer = mm_camera_intf_cancel_buf,
     .get_queued_buf_count = mm_camera_intf_get_queued_buf_count,
     .map_stream_buf = mm_camera_intf_map_stream_buf,
     .map_stream_bufs = mm_camera_intf_map_stream_bufs,

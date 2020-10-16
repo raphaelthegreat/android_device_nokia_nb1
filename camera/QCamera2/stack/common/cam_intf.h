@@ -283,11 +283,6 @@ typedef struct{
     size_t zzhdr_sizes_tbl_cnt;                             /* Number of resolutions in zzHDR mode*/
     cam_dimension_t zzhdr_sizes_tbl[MAX_SIZES_CNT];         /* Table for ZZHDR supported sizes */
 
-    size_t supported_quadra_cfa_dim_cnt;              /* Number of resolutions in Quadra CFA mode */
-    cam_dimension_t quadra_cfa_dim[MAX_SIZES_CNT];    /* Table for Quadra CFA supported sizes */
-    cam_format_t quadra_cfa_format;                   /* Quadra CFA output format */
-    uint32_t is_remosaic_lib_present;                 /* Flag indicating if remosaic lib present */
-
     /* supported preview formats */
     size_t supported_preview_fmt_cnt;
     cam_format_t supported_preview_fmts[CAM_FORMAT_MAX];
@@ -369,7 +364,7 @@ typedef struct{
 
     /* nano seconds */
     int64_t exposure_time_range[EXPOSURE_TIME_RANGE_CNT];
-    volatile char         xiaomi_reserved1[8];
+
     /* nano seconds */
     int64_t max_frame_duration;
 
@@ -591,7 +586,7 @@ typedef struct {
 } cam_stream_img_prop_t;
 
 typedef struct {
-    uint8_t enableStream; /*0 – stop and 1-start */
+    uint8_t enableStream; /*0 stop and 1-start */
 } cam_request_frames;
 
 typedef struct {
@@ -761,6 +756,7 @@ typedef struct {
     INCLUDE(CAM_INTF_META_FACE_DETECTION,               cam_face_detection_data_t,      1);
     INCLUDE(CAM_INTF_META_FACE_RECOG,                   cam_face_recog_data_t,          1);
     INCLUDE(CAM_INTF_META_FACE_BLINK,                   cam_face_blink_data_t,          1);
+    INCLUDE(LEECO_RESERVED_PARAM_3,                     char,                           2);
     INCLUDE(CAM_INTF_META_FACE_GAZE,                    cam_face_gaze_data_t,           1);
     INCLUDE(CAM_INTF_META_FACE_SMILE,                   cam_face_smile_data_t,          1);
     INCLUDE(CAM_INTF_META_FACE_LANDMARK,                cam_face_landmarks_data_t,      1);
@@ -789,7 +785,7 @@ typedef struct {
     /* Specific to HAL3 */
     INCLUDE(CAM_INTF_META_FRAME_NUMBER_VALID,           int32_t,                     1);
     INCLUDE(CAM_INTF_META_URGENT_FRAME_NUMBER_VALID,    int32_t,                     1);
-    INCLUDE(CAM_INTF_META_FRAME_DROPPED,                cam_stream_ID_t,             1);
+    INCLUDE(CAM_INTF_META_FRAME_DROPPED,                cam_frame_dropped_t,         1);
     INCLUDE(CAM_INTF_META_FRAME_NUMBER,                 uint32_t,                    1);
     INCLUDE(CAM_INTF_META_URGENT_FRAME_NUMBER,          uint32_t,                    1);
     INCLUDE(CAM_INTF_META_COLOR_CORRECT_MODE,           uint32_t,                    1);
@@ -829,6 +825,7 @@ typedef struct {
     INCLUDE(CAM_INTF_META_SCENE_FLICKER,                uint32_t,                    1);
     INCLUDE(CAM_INTF_META_SENSOR_EXPOSURE_TIME,         int64_t,                     1);
     INCLUDE(CAM_INTF_META_SENSOR_FRAME_DURATION,        int64_t,                     1);
+    INCLUDE(LEECO_RESERVED_PARAM_2,                     char,                       32);
     INCLUDE(CAM_INTF_META_SENSOR_SENSITIVITY,           int32_t,                     1);
     INCLUDE(CAM_INTF_META_ISP_SENSITIVITY ,             int32_t,                     1);
     INCLUDE(CAM_INTF_META_SENSOR_TIMESTAMP,             int64_t,                     1);
@@ -884,6 +881,7 @@ typedef struct {
     INCLUDE(CAM_INTF_PARM_QUERY_FLASH4SNAP,             int32_t,                     1);
     INCLUDE(CAM_INTF_PARM_EXPOSURE,                     int32_t,                     1);
     INCLUDE(CAM_INTF_PARM_SHARPNESS,                    int32_t,                     1);
+    INCLUDE(LEECO_RESERVED_PARAM_1,                     char,                       16);
     INCLUDE(CAM_INTF_PARM_CONTRAST,                     int32_t,                     1);
     INCLUDE(CAM_INTF_PARM_SATURATION,                   int32_t,                     1);
     INCLUDE(CAM_INTF_PARM_BRIGHTNESS,                   int32_t,                     1);
@@ -933,7 +931,6 @@ typedef struct {
     INCLUDE(CAM_INTF_META_TOUCH_AE_RESULT,              int32_t,                     1);
     INCLUDE(CAM_INTF_PARM_DUAL_LED_CALIBRATION,         int32_t,                     1);
     INCLUDE(CAM_INTF_PARM_ADV_CAPTURE_MODE,             uint8_t,                     1);
-    INCLUDE(CAM_INTF_PARM_QUADRA_CFA,                   int32_t,                     1);
 
     /* HAL3 specific */
     INCLUDE(CAM_INTF_META_STREAM_INFO,                  cam_stream_size_info_t,      1);
@@ -983,15 +980,8 @@ typedef struct {
     INCLUDE(CAM_INTF_PARM_MANUAL_CAPTURE_TYPE,          cam_manual_capture_type,     1);
     INCLUDE(CAM_INTF_AF_STATE_TRANSITION,               uint8_t,                     1);
     INCLUDE(CAM_INTF_PARM_INITIAL_EXPOSURE_INDEX,       uint32_t,                    1);
-    INCLUDE(XIAOMI_DUMMY1,                              uint8_t,                     4);
-    INCLUDE(CAM_INTF_PARM_INSTANT_AEC,                  uint8_t,                     1);// BAD +36 OK
-    INCLUDE(CAM_INTF_META_REPROCESS_FLAGS,              uint8_t,                     1);//BAD stock +43 OK
-    volatile char         xiaomi_reserved3[2];
-    INCLUDE(XIAOMI_DUMMY2,                              uint8_t,                     4);
-    INCLUDE(CAM_INTF_PARM_JPEG_ENCODE_CROP,             cam_stream_crop_info_t,      1); // BAD + 4 ?
-    INCLUDE(CAM_INTF_PARM_JPEG_SCALE_DIMENSION,         cam_dimension_t,             1); //BAD stock +44
-    volatile char         xiaomi_reserved4[4];
-    INCLUDE(XIAOMI_DUMMY3,                              uint8_t,                     12);
+    INCLUDE(CAM_INTF_PARM_INSTANT_AEC,                  uint8_t,                     1);
+    INCLUDE(CAM_INTF_META_REPROCESS_FLAGS,              uint8_t,                     1);
 } metadata_data_t;
 
 /* Update clear_metadata_buffer() function when a new is_xxx_valid is added to

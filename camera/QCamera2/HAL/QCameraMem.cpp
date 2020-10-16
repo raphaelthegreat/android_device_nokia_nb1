@@ -44,6 +44,7 @@
 #include "QCameraTrace.h"
 
 // Media dependencies
+#include "OMX_QCOMExtns.h"
 #ifdef USE_MEDIA_EXTENSIONS
 #include <media/hardware/HardwareAPI.h>
 typedef struct VideoNativeHandleMetadata media_metadata_buffer;
@@ -652,7 +653,7 @@ int QCameraMemoryPool::findBufferLocked(
         size_t size, bool cached, cam_stream_type_t streamType)
 {
     int rc = NAME_NOT_FOUND;
-    size_t alignsize = (size + 4095U) & (~4095U);
+
     if (mPools[streamType].empty()) {
         return NAME_NOT_FOUND;
     }
@@ -660,7 +661,7 @@ int QCameraMemoryPool::findBufferLocked(
     List<struct QCameraMemory::QCameraMemInfo>::iterator it = mPools[streamType].begin();
     if (streamType == CAM_STREAM_TYPE_OFFLINE_PROC) {
         for( ; it != mPools[streamType].end() ; it++) {
-            if( ((*it).size == alignsize) &&
+            if( ((*it).size == size) &&
                     ((*it).heap_id == heap_id) &&
                     ((*it).cached == cached) ) {
                 memInfo = *it;
@@ -1672,7 +1673,8 @@ int QCameraVideoMemory::closeNativeHandle(const void *data, bool metadata)
             return BAD_VALUE;
         }
     } else {
-        LOGW("Warning: Not of type video meta buffer");
+        LOGE("Not of type video meta buffer. Failed");
+        return BAD_VALUE;
     }
 #endif
     return rc;
@@ -1805,8 +1807,6 @@ QCameraGrallocMemory::QCameraGrallocMemory(camera_request_memory memory, void* c
         mBufferHandle[i] = NULL;
         mLocalFlag[i] = BUFFER_NOT_OWNED;
         mPrivateHandle[i] = NULL;
-        mBufferStatus[i] = STATUS_IDLE;
-        mCameraMemory[i] = NULL;
     }
 }
 
@@ -1877,7 +1877,7 @@ void QCameraGrallocMemory::setMaxFPS(int maxFPS)
 
     /* the new fps will be updated in metadata of the next frame enqueued to display*/
     mMaxFPS = maxFPS;
-    LOGH("Setting max fps %d to display", maxFPS);
+    LOGH("Setting max fps %d to display", mMaxFPS);
 }
 
 /*===========================================================================
@@ -2142,9 +2142,17 @@ int QCameraGrallocMemory::allocate(uint8_t count, size_t /*size*/,
          goto end;
     }
 
-    err = mWindow->set_buffers_geometry(mWindow, mWidth, mHeight, mFormat);
+    err = mWindow->set_buffers_geometry(mWindow, mStride, mScanline, mFormat);
     if (err != 0) {
          LOGE("set_buffers_geometry failed: %s (%d)",
+                strerror(-err), -err);
+         ret = UNKNOWN_ERROR;
+         goto end;
+    }
+
+    err = mWindow->set_crop(mWindow, 0, 0, mWidth, mHeight);
+    if (err != 0) {
+         LOGE("set_crop failed: %s (%d)",
                 strerror(-err), -err);
          ret = UNKNOWN_ERROR;
          goto end;
@@ -2507,24 +2515,5 @@ uint8_t QCameraGrallocMemory::checkIfAllBuffersMapped() const
     return (mBufferCount == mMappableBuffers);
 }
 
-/*===========================================================================
- * FUNCTION   : setBufferStatus
- *
- * DESCRIPTION: set buffer status
- *
- * PARAMETERS :
- *   @index   : index of the buffer
- *   @status  : status of the buffer, whether skipped,etc
- *
- * RETURN     : none
- *==========================================================================*/
-void QCameraGrallocMemory::setBufferStatus(uint32_t index, BufferStatus status)
-{
-    if (index >= mBufferCount) {
-        LOGE("index out of bound");
-        return;
-    }
-    mBufferStatus[index] = status;
-}
 
 }; //namespace qcamera

@@ -1082,11 +1082,11 @@ int32_t QCameraParametersIntf::configFrameCapture(bool commitSettings)
     return mImpl->configFrameCapture(commitSettings);
 }
 
-int32_t QCameraParametersIntf::resetFrameCapture(bool commitSettings, bool lowLightEnabled)
+int32_t QCameraParametersIntf::resetFrameCapture(bool commitSettings)
 {
     Mutex::Autolock lock(mLock);
     CHECK_PARAM_INTF(mImpl);
-    return mImpl->resetFrameCapture(commitSettings,lowLightEnabled);
+    return mImpl->resetFrameCapture(commitSettings);
 }
 
 cam_still_more_t QCameraParametersIntf::getStillMoreSettings()

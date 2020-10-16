@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -24,53 +24,26 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
  */
 
-#ifndef __QCAMERA_FLASH_H__
-#define __QCAMERA_FLASH_H__
+#ifndef __QCAMERA_MJPEG_DECODE_H
+#define __QCAMERA_MJPEG_DECODE_H
 
-// Camera dependencies
-#include "hardware/camera_common.h"
+typedef int MJPEGD_ERR;
+#define MJPEGD_NO_ERROR          0
+#define MJPEGD_ERROR            -1
+#define MJPEGD_INSUFFICIENT_MEM -2
 
-extern "C" {
-#include "mm_camera_interface.h"
-}
+MJPEGD_ERR mjpegDecoderInit(void**);
 
-namespace qcamera {
+MJPEGD_ERR mjpegDecoderDestroy(void* mjpegd);
 
-#define QCAMERA_TORCH_CURRENT_VALUE 200
+MJPEGD_ERR mjpegDecode(
+            void*   mjpegd,
+            char*   mjpegBuffer,
+            int     mjpegBufferSize,
+            char*   outputYptr,
+            char*   outputUVptr,
+            int     outputFormat);
 
-enum flashLed
-{
-    LED_FIRST,
-    LED_SECOND,
-    LED_DUAL
-};
-
-class QCameraFlash {
-public:
-    static QCameraFlash& getInstance();
-
-    int32_t registerCallbacks(const camera_module_callbacks_t* callbacks);
-    int32_t initFlash(const int camera_id);
-    int32_t setFlashMode(const int camera_id, const bool on, flashLed led);
-    int32_t deinitFlash(const int camera_id);
-    int32_t reserveFlashForCamera(const int camera_id);
-    int32_t releaseFlashFromCamera(const int camera_id);
-
-private:
-    QCameraFlash();
-    virtual ~QCameraFlash();
-    QCameraFlash(const QCameraFlash&);
-    QCameraFlash& operator=(const QCameraFlash&);
-
-    const camera_module_callbacks_t *m_callbacks;
-    std::pair <int32_t,int32_t> m_flashFds[MM_CAMERA_MAX_NUM_SENSORS];
-    bool m_flashOn[MM_CAMERA_MAX_NUM_SENSORS];
-    bool m_cameraOpen[MM_CAMERA_MAX_NUM_SENSORS];
-};
-
-}; // namespace qcamera
-
-#endif /* __QCAMERA_FLASH_H__ */
+#endif /* __QCAMERA_MJPEG_DECODE_H */

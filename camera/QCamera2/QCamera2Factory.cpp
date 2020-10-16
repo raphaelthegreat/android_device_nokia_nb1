@@ -49,6 +49,8 @@ extern "C" {
 #include "mm_camera_dbg.h"
 }
 
+#define MAX_INIT_RETRIES 3
+
 using namespace android;
 
 namespace qcamera {
@@ -87,6 +89,19 @@ QCamera2Factory::QCamera2Factory()
 #ifndef QCAMERA_HAL1_SUPPORT
     isHAL3Enabled = 1;
 #endif
+
+    if (mNumOfCameras <= 0) {
+        for (int j = 0; j < MAX_INIT_RETRIES; j++) {
+            LOGI("No camera devices detected, retrying...");
+            sleep(2);
+            mNumOfCameras = get_num_of_cameras();
+            if (mNumOfCameras <= 0) {
+                continue;
+            } else {
+                break;
+            }
+        }
+    }
 
     // Signifies whether system has to enable dual camera mode
     snprintf(propDefault, PROPERTY_VALUE_MAX, "%d", isDualCamAvailable(isHAL3Enabled));
@@ -493,7 +508,7 @@ struct hw_module_methods_t QCamera2Factory::mModuleMethods = {
  *              none-zero failure code
  *==========================================================================*/
 int QCamera2Factory::openLegacy(
-        int32_t cameraId, uint32_t halVersion, struct hw_device_t** hw_device)
+        int32_t cameraId, uint32_t halVersion, struct hw_device_t** hw_device __attribute__ ((unused)))
 {
     int rc = NO_ERROR;
 
@@ -563,7 +578,7 @@ int QCamera2Factory::setTorchMode(const char* camera_id, bool on)
         retVal = flash.initFlash(cameraIdInt);
 
         if (retVal == 0) {
-            retVal = flash.setFlashMode(cameraIdInt, on);
+            retVal = flash.setFlashMode(cameraIdInt, on, LED_DUAL);
             if ((retVal == 0) && (mCallbacks != NULL)) {
                 mCallbacks->torch_mode_status_change(mCallbacks,
                         camera_id,
@@ -575,7 +590,7 @@ int QCamera2Factory::setTorchMode(const char* camera_id, bool on)
         }
     } else {
         cameraIdInt = static_cast<int>(cameraIdLong);
-        retVal = flash.setFlashMode(cameraIdInt, on);
+        retVal = flash.setFlashMode(cameraIdInt, on, LED_DUAL);
 
         if (retVal == 0) {
             retVal = flash.deinitFlash(cameraIdInt);
@@ -590,6 +605,7 @@ int QCamera2Factory::setTorchMode(const char* camera_id, bool on)
         }
     }
 
+    LOGD("X, retVal = %d", retVal);
     return retVal;
 }
 
@@ -608,7 +624,9 @@ bool QCamera2Factory::isDualCamAvailable(int hal3Enabled)
 {
     bool rc = false;
     int i = 0;
+#ifdef QCAMERA_HAL1_SUPPORT
     camera_info info;
+#endif
     cam_sync_type_t cam_type = CAM_TYPE_MAIN;
 
     for (i = 0; i < mNumOfCameras; i++) {

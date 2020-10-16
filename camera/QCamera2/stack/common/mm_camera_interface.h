@@ -745,24 +745,6 @@ typedef struct {
                      uint32_t ch_id,
                      mm_camera_buf_def_t *buf);
 
-    /** cancel_buffer: fucntion definition for recalling a frame
-     *        buffer from the kernel this is most likely when h/w
-     *        failed to use this buffer and dropped the frame we use
-     *        this API to recall the buffer and return it to the
-     *        framework
-     *    @camera_handle : camer handler
-     *    @ch_id : channel handler
-     *    @stream_id : stream handle
-     *    @buf : a frame buffer to be queued back to kernel
-     *  Return value: 0 -- success
-     *                -1 -- failure
-     **/
-    int32_t (*cancel_buffer) (uint32_t camera_handle,
-                     uint32_t ch_id,
-                     uint32_t stream_id,
-                     uint32_t buf_idx);
-
-
     /** get_queued_buf_count: fucntion definition for querying queued buf count
      *    @camera_handle : camer handler
      *    @ch_id : channel handler
@@ -901,9 +883,8 @@ int32_t mm_stream_calc_offset_preview(cam_stream_info_t *stream_info,
         cam_padding_info_t *padding,
         cam_stream_buf_plane_info_t *buf_planes);
 
-int32_t mm_stream_calc_offset_post_view(cam_stream_info_t *stream_info,
+int32_t mm_stream_calc_offset_post_view(cam_format_t fmt,
         cam_dimension_t *dim,
-        cam_padding_info_t *padding,
         cam_stream_buf_plane_info_t *buf_planes);
 
 int32_t mm_stream_calc_offset_snapshot(cam_format_t fmt,

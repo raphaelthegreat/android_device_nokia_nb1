@@ -14,11 +14,16 @@
 # limitations under the License.
 #
 
+LOCAL_PATH := device/nokia/ΝΒ1
+
 # Inherit from nokia msm8998-common
 -include device/nokia/msm8998-common/BoardConfigCommon.mk
 
-# Bootloader
-TARGET_BOOTLOADER_BOARD_NAME := msm8998
+# Camera
+USE_DEVICE_SPECIFIC_CAMERA := true
+DEVICE_SPECIFIC_CAMERA_PATH := $(LOCAL_PATH)/camera
+TARGET_SUPPORT_HAL1 := true
+TARGET_USES_MEDIA_EXTENSIONS := true
 
 # Display
 TARGET_SCREEN_DENSITY := 560

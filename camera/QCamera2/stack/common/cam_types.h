@@ -51,7 +51,7 @@
 #define CEILING4(X)  (((X) + 0x0003) & 0xFFFC)
 #define CEILING2(X)  (((X) + 0x0001) & 0xFFFE)
 
-#define MAX_ZOOMS_CNT 91
+#define MAX_ZOOMS_CNT 71
 #define MAX_SIZES_CNT 40
 #define MAX_EXP_BRACKETING_LENGTH 32
 #define MAX_ROI 10
@@ -109,12 +109,11 @@
 #define MAX_INFLIGHT_REQUESTS  6
 #define MAX_INFLIGHT_BLOB      3
 #define MIN_INFLIGHT_REQUESTS  3
-#define MIN_INFLIGHT_60FPS_REQUESTS (6)
 #define MAX_INFLIGHT_REPROCESS_REQUESTS 1
 #define MAX_INFLIGHT_HFR_REQUESTS (48)
 #define MIN_INFLIGHT_HFR_REQUESTS (40)
 
-#define QCAMERA_DUMP_FRM_LOCATION "/data/misc/camera/"
+#define QCAMERA_DUMP_FRM_LOCATION "/data/vendor/camera/"
 #define QCAMERA_MAX_FILEPATH_LENGTH 64
 
 #define LIKELY(x)       __builtin_expect((x), true)
@@ -144,9 +143,6 @@
 
 /* Defines the number of columns in the color correction matrix (CCM) */
 #define AWB_NUM_CCM_COLS (3)
-
-/* Index to switch H/W to consume to free-run Q*/
-#define CAM_FREERUN_IDX 0xFFFFFFFF
 
 typedef uint64_t cam_feature_mask_t;
 
@@ -550,12 +546,6 @@ typedef struct {
 } cam_sensitivity_range_t;
 
 typedef enum {
-    CAM_ISO_PRIORITY,
-    CAM_EXP_PRIORITY,
-    CAM_DEFAULT_OFF,
-} cam_priority_mode_t;
-
-typedef enum {
     CAM_HFR_MODE_OFF,
     CAM_HFR_MODE_60FPS,
     CAM_HFR_MODE_90FPS,
@@ -891,9 +881,9 @@ typedef enum {
 
 typedef enum {
     IS_TYPE_NONE,
-    IS_TYPE_CROP,
     IS_TYPE_DIS,
     IS_TYPE_GA_DIS,
+    IS_TYPE_EIS_1_0,
     IS_TYPE_EIS_2_0,
     IS_TYPE_EIS_3_0,
     IS_TYPE_MAX
@@ -1381,16 +1371,10 @@ typedef enum {
     NEED_FUTURE_FRAME,
 } cam_prep_snapshot_state_t;
 
-typedef enum {
-    CC_RED_GAIN,
-    CC_GREEN_RED_GAIN,
-    CC_GREEN_BLUE_GAIN,
-    CC_BLUE_GAIN,
-    CC_GAIN_MAX
-} cam_cc_gains_type_t;
+#define CC_GAINS_COUNT  4
 
 typedef struct {
-    float gains[CC_GAIN_MAX];
+    float gains[CC_GAINS_COUNT];
 } cam_color_correct_gains_t;
 
 typedef struct {
@@ -1665,13 +1649,8 @@ typedef struct {
 } cam_hw_data_overwrite_t;
 
 typedef struct {
-    uint32_t streamID;
-    uint32_t buf_index;
-} cam_stream_request_t;
-
-typedef struct {
     uint32_t num_streams;
-    cam_stream_request_t stream_request[MAX_NUM_STREAMS];
+    uint32_t streamID[MAX_NUM_STREAMS];
 } cam_stream_ID_t;
 
 /*CAC Message posted during pipeline*/
@@ -2107,6 +2086,9 @@ typedef enum {
     CAM_INTF_PARM_MANUAL_FOCUS_POS, /* 180 */
     /* Manual White balance gains */
     CAM_INTF_PARM_WB_MANUAL,
+    LEECO_RESERVED_PARAM_1,
+    LEECO_RESERVED_PARAM_2,
+    LEECO_RESERVED_PARAM_3,
     /* Offline Data Overwrite */
     CAM_INTF_PARM_HW_DATA_OVERWRITE,
     /* IMG LIB reprocess debug section */
@@ -2173,25 +2155,13 @@ typedef enum {
     CAM_INTF_META_TOUCH_AE_RESULT,
     /* Param for updating initial exposure index value*/
     CAM_INTF_PARM_INITIAL_EXPOSURE_INDEX,
-    /* Hack 1 to make proper enum */
-    XIAOMI_DUMMY1,
     /* Gain applied post raw captrue.
        ISP digital gain */
     CAM_INTF_META_ISP_SENSITIVITY,
     /* Param for enabling instant aec*/
     CAM_INTF_PARM_INSTANT_AEC,
-    /* Hack 2 to make proper enum */
-    XIAOMI_DUMMY2,
     /* Param for tracking previous reprocessing activity */
-    CAM_INTF_META_REPROCESS_FLAGS,
-    /* Param of cropping information for JPEG encoder */
-    CAM_INTF_PARM_JPEG_ENCODE_CROP,
-    /* Param of scaling information for JPEG encoder */
-    CAM_INTF_PARM_JPEG_SCALE_DIMENSION,
-    /*Param for updating Quadra CFA mode */
-    CAM_INTF_PARM_QUADRA_CFA,
-    /* Hack 3 to make proper enum */
-    XIAOMI_DUMMY3,
+    CAM_INTF_META_REPROCESS_FLAGS, /* 226 */
     CAM_INTF_PARM_MAX
 } cam_intf_parm_type_t;
 
@@ -2349,6 +2319,11 @@ typedef enum {
 } cam_flash_ctrl_t;
 
 typedef struct {
+    uint8_t frame_dropped; /*  This flag indicates whether any stream buffer is dropped or not */
+    cam_stream_ID_t cam_stream_ID; /* if dropped, Stream ID of dropped streams */
+} cam_frame_dropped_t;
+
+typedef struct {
     uint8_t ae_mode;
     uint8_t awb_mode;
     uint8_t af_mode;
@@ -2413,13 +2388,11 @@ typedef struct {
 #define CAM_QTI_FEATURE_SW_TNR          ((cam_feature_mask_t)1UL<<30)
 #define CAM_QCOM_FEATURE_METADATA_PROCESSING ((cam_feature_mask_t)1UL<<31)
 #define CAM_QCOM_FEATURE_PAAF           (((cam_feature_mask_t)1UL)<<32)
-#define CAM_QCOM_FEATURE_QUADRA_CFA     (((cam_feature_mask_t)1UL)<<33)
-#define CAM_QTI_FEATURE_PPEISCORE       (((cam_feature_mask_t)1UL)<<34)
 #define CAM_QCOM_FEATURE_PP_SUPERSET    (CAM_QCOM_FEATURE_DENOISE2D|CAM_QCOM_FEATURE_CROP|\
                                          CAM_QCOM_FEATURE_ROTATION|CAM_QCOM_FEATURE_SHARPNESS|\
                                          CAM_QCOM_FEATURE_SCALE|CAM_QCOM_FEATURE_CAC|\
                                          CAM_QCOM_FEATURE_EZTUNE|CAM_QCOM_FEATURE_CPP_TNR|\
-                                         CAM_QCOM_FEATURE_LLVD|CAM_QCOM_FEATURE_QUADRA_CFA)
+                                         CAM_QCOM_FEATURE_LLVD)
 
 #define CAM_QCOM_FEATURE_PP_PASS_1      CAM_QCOM_FEATURE_PP_SUPERSET
 #define CAM_QCOM_FEATURE_PP_PASS_2      CAM_QCOM_FEATURE_SCALE | CAM_QCOM_FEATURE_CROP;
@@ -2751,19 +2724,8 @@ typedef struct {
     cam_dimension_t analysis_recommended_res;
 } cam_analysis_info_t;
 
-/** mm_camera_event_t: structure for event
-*    @server_event_type : event type from serer
-*    @status : status of an event, value could be
-*              CAM_STATUS_SUCCESS
-*              CAM_STATUS_FAILED
-**/
 typedef struct {
-    cam_event_type_t server_event_type;
-    uint32_t status;
-} cam_event_t;
-
-typedef struct {
-    /* Information for DDM metadata*/
+    /* Information for DDM */
     cam_stream_crop_info_t   sensor_crop_info; /* sensor crop info */
     cam_stream_crop_info_t   camif_crop_info; /* CAMIF crop info */
     cam_stream_crop_info_t   isp_crop_info; /* ISP crop info */
@@ -2771,10 +2733,7 @@ typedef struct {
     cam_focal_length_ratio_t af_focal_length_ratio; /* AF focal length ratio */
     int32_t                  pipeline_flip; /* current pipeline flip and rotational parameters */
     cam_rotation_info_t      rotation_info; /* rotation information */
-    cam_area_t               af_roi;        /* AF roi info */
-    /* Information for CPP reprocess */
-    cam_dyn_img_data_t       dyn_mask;      /* Post processing dynamic feature mask */
-} cam_reprocess_info_t;
+} cam_ddm_info_t;
 
 /***********************************
 * ENUM definition for custom parameter type

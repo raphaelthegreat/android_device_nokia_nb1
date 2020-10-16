@@ -239,7 +239,6 @@ int32_t QCameraChannel::addStream(QCameraAllocator &allocator,
     rc = pStream->init(streamInfoBuf, miscBuf, minStreamBufNum,
                        stream_cb, userdata, bDynAllocBuf);
     if (rc == 0) {
-        Mutex::Autolock lock(mStreamLock);
         mStreams.add(pStream);
     } else {
         delete pStream;
@@ -276,7 +275,6 @@ int32_t QCameraChannel::linkStream(QCameraChannel *ch, QCameraStream *stream)
         LOGE("Linking of stream failed");
         rc = INVALID_OPERATION;
     } else {
-        Mutex::Autolock lock(mStreamLock);
         mStreams.add(stream);
     }
 
@@ -384,17 +382,14 @@ int32_t QCameraChannel::stop()
         return NO_INIT;
     }
 
-    {
-        Mutex::Autolock lock(mStreamLock);
-        while(i < mStreams.size()) {
-            if (mStreams[i] != NULL) {
-                if (m_handle == mStreams[i]->getChannelHandle()) {
-                    mStreams[i]->stop();
-                    i++;
-                } else {
-                    // Remove linked stream from stream list
-                    mStreams.removeAt(i);
-                }
+    while(i < mStreams.size()) {
+        if (mStreams[i] != NULL) {
+            if (m_handle == mStreams[i]->getChannelHandle()) {
+                mStreams[i]->stop();
+                i++;
+            } else {
+                // Remove linked stream from stream list
+                mStreams.removeAt(i);
             }
         }
     }
@@ -495,7 +490,6 @@ int32_t QCameraChannel::processZoomDone(preview_stream_ops_t *previewWindow,
                                         cam_crop_data_t &crop_info)
 {
     int32_t rc = NO_ERROR;
-    Mutex::Autolock lock(mStreamLock);
     for (size_t i = 0; i < mStreams.size(); i++) {
         if ((mStreams[i] != NULL) &&
                 (m_handle == mStreams[i]->getChannelHandle())) {
@@ -582,7 +576,6 @@ QCameraStream *QCameraChannel::getStreamByIndex(uint32_t index)
 int32_t QCameraChannel::UpdateStreamBasedParameters(QCameraParametersIntf &param)
 {
     int32_t rc = NO_ERROR;
-    Mutex::Autolock lock(mStreamLock);
     if (param.isPreviewFlipChanged()) {
         // try to find preview stream
         for (size_t i = 0; i < mStreams.size(); i++) {
@@ -1066,16 +1059,9 @@ int32_t QCameraReprocessChannel::addReprocStreamsFromSource(
                 rc = pStream->getFormat(streamInfo->fmt);
             }
 
-            if (pStream->isTypeOf(CAM_STREAM_TYPE_PREVIEW) ||
-                    pStream->isTypeOf(CAM_STREAM_TYPE_POSTVIEW) ||
-                    pStream->isOrignalTypeOf(CAM_STREAM_TYPE_PREVIEW) ||
-                    pStream->isOrignalTypeOf(CAM_STREAM_TYPE_POSTVIEW)) {
-                if (pp_featuremask.feature_mask & CAM_QCOM_FEATURE_SCALE) {
-                    param.getThumbnailSize(&(streamInfo->dim.width),
-                            &(streamInfo->dim.height));
-                } else {
-                    pStream->getFrameDimension(streamInfo->dim);
-                }
+            if (pStream->isTypeOf(CAM_STREAM_TYPE_POSTVIEW) ||
+                    pStream->isTypeOf(CAM_STREAM_TYPE_PREVIEW)) {
+                param.getThumbnailSize(&(streamInfo->dim.width), &(streamInfo->dim.height));
             } else {
                 if ((param.isPostProcScaling()) &&
                         (pp_featuremask.feature_mask & CAM_QCOM_FEATURE_SCALE)) {

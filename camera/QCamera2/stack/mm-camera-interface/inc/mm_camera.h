@@ -207,7 +207,6 @@ typedef enum {
     MM_STREAM_EVT_GET_PARM,
     MM_STREAM_EVT_DO_ACTION,
     MM_STREAM_EVT_GET_QUEUED_BUF_COUNT,
-    MM_STREAM_EVT_CANCEL_BUF,
     MM_STREAM_EVT_MAX
 } mm_stream_evt_type_t;
 
@@ -537,23 +536,11 @@ typedef struct mm_camera_obj {
     uint32_t sessionid; /* Camera server session id */
 } mm_camera_obj_t;
 
-//HACKED camera_info struct from hardware/libhardware/include/hardware/camera_common.h
-typedef struct xiaomi_camera_info {
-    int facing;
-    int orientation;
-    uint32_t device_version;
-    const camera_metadata_t *static_camera_characteristics;
-    int resource_cost;
-    char** conflicting_devices;
-    size_t conflicting_devices_length;
-    volatile char xiaomi_reserved[20];//uknown addition by xiaomi
-} xiaomi_camera_info_t;
-
 typedef struct {
     int8_t num_cam;
     char video_dev_name[MM_CAMERA_MAX_NUM_SENSORS][MM_CAMERA_DEV_NAME_LEN];
     mm_camera_obj_t *cam_obj[MM_CAMERA_MAX_NUM_SENSORS];
-    struct xiaomi_camera_info info[MM_CAMERA_MAX_NUM_SENSORS]; //hacked struct 20*5 bytes bigger in xiaomi blobs
+    struct camera_info info[MM_CAMERA_MAX_NUM_SENSORS];
     cam_sync_type_t cam_type[MM_CAMERA_MAX_NUM_SENSORS];
     cam_sync_mode_t cam_mode[MM_CAMERA_MAX_NUM_SENSORS];
     uint8_t is_yuv[MM_CAMERA_MAX_NUM_SENSORS]; // 1=CAM_SENSOR_YUV, 0=CAM_SENSOR_RAW
@@ -603,10 +590,6 @@ extern int32_t mm_camera_register_event_notify(mm_camera_obj_t *my_obj,
 extern int32_t mm_camera_qbuf(mm_camera_obj_t *my_obj,
                               uint32_t ch_id,
                               mm_camera_buf_def_t *buf);
-extern int32_t mm_camera_cancel_buf(mm_camera_obj_t *my_obj,
-                       uint32_t ch_id,
-                       uint32_t stream_id,
-                       uint32_t buf_idx);
 extern int32_t mm_camera_get_queued_buf_count(mm_camera_obj_t *my_obj,
         uint32_t ch_id, uint32_t stream_id);
 extern int32_t mm_camera_query_capability(mm_camera_obj_t *my_obj);
@@ -725,8 +708,6 @@ extern int32_t mm_channel_init(mm_channel_t *my_obj,
  * from the context of dataCB, but async stop is holding ch_lock */
 extern int32_t mm_channel_qbuf(mm_channel_t *my_obj,
                                mm_camera_buf_def_t *buf);
-extern int32_t mm_channel_cancel_buf(mm_channel_t *my_obj,
-                        uint32_t stream_id, uint32_t buf_idx);
 /* mm_stream */
 extern int32_t mm_stream_fsm_fn(mm_stream_t *my_obj,
                                 mm_stream_evt_type_t evt,
