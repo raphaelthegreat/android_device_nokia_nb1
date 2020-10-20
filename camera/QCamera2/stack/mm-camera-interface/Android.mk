@@ -1,6 +1,7 @@
 OLD_LOCAL_PATH := $(LOCAL_PATH)
 LOCAL_PATH := $(call my-dir)
 
+include $(LOCAL_PATH)/../../../common.mk
 include $(CLEAR_VARS)
 
 LOCAL_HEADER_LIBRARIES := libhardware_headers
@@ -49,7 +50,8 @@ $(LOCAL_PATH)/../common \
 $(LOCAL_PATH)/../common/leak \
 
 LOCAL_CFLAGS += -DCAMERA_ION_HEAP_ID=ION_IOMMU_HEAP_ID
-LOCAL_HEADER_LIBRARIES := generated_kernel_headers
+LOCAL_C_INCLUDES+= $(kernel_includes)
+LOCAL_ADDITIONAL_DEPENDENCIES := $(common_deps)
 
 ifneq (1,$(filter 1,$(shell echo "$$(( $(PLATFORM_SDK_VERSION) >= 17 ))" )))
 LOCAL_CFLAGS += -include bionic/libc/kernel/common/linux/socket.h
@@ -64,7 +66,11 @@ endif
 LOCAL_SRC_FILES := $(MM_CAM_FILES)
 
 LOCAL_MODULE           := libmmcamera_interface
-LOCAL_SHARED_LIBRARIES := libdl libcutils liblog libhal_dbg
+include $(SDCLANG_COMMON_DEFS)
+
+LOCAL_SHARED_LIBRARIES := libdl libcutils liblog \
+                          libhal_dbg
+
 LOCAL_MODULE_TAGS := optional
 LOCAL_VENDOR_MODULE := true
 
