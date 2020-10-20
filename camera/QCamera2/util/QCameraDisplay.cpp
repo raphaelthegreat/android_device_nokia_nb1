@@ -121,6 +121,92 @@ void* QCameraDisplay::vsyncThreadCamera(void * data)
     }
     return NULL;
 }
+#else //USER_DISPLAY_SERVICE
+//initializing static
+QCameraDisplay*
+QCameraDisplay::mCameraDisplay = NULL;
+
+/*===========================================================================
+ * FUNCTION   : onRegistration
+ *
+ * DESCRIPTION: DisplayService registered notification callback from hwservice.
+ *              Calling init to get display service.
+ *
+ * PARAMETERS :
+ *   @fqName  : fully-qualified instance name (UNUSED).
+ *   @name    : string by which display service is registerd.
+ *   @preexisting: If true, this means the registration was
+ *                 pre-existing at the time this IServiceNotification
+ *                 object is itself registered. Otherwise, this means
+ *                 onRegistration is triggered by a newly registered
+ *                 service.
+ *
+ * RETURN     : void.Just to fullfill the type requirement of thread function.
+ *==========================================================================*/
+Return<void>
+QCameraDisplay::ServiceRegisterNotification::onRegistration(const hidl_string & /*fqName*/,
+                                                                  const hidl_string & /*name*/,
+                                                                  bool /*preexisting*/)
+{
+    if(mCameraDisplay->mDisplayService != nullptr)
+    {
+        return Return<void>();
+    }
+
+    LOGD("Display service is available, get the interface");
+    mCameraDisplay->init();
+
+    return Return<void>();
+}
+
+/*===========================================================================
+ * FUNCTION   : instance
+ *
+ * DESCRIPTION: create singleton instance of QCameraDisplay
+ *
+ * PARAMETERS : none
+ *
+ * RETURN     : pointer to QCameraDisplay
+ *==========================================================================*/
+QCameraDisplay*
+QCameraDisplay::instance()
+{
+    if(mCameraDisplay == NULL)
+    {
+        mCameraDisplay = new QCameraDisplay();
+        mCameraDisplay->mRegistrationCB = new ServiceRegisterNotification();
+        IDisplayService::registerForNotifications("", mCameraDisplay->mRegistrationCB);
+    }
+    return mCameraDisplay;
+}
+
+/*===========================================================================
+ * FUNCTION   : serviceDied
+ *
+ * DESCRIPTION: Display service death recipient. Clear all variables.
+ *
+ * PARAMETERS : uint64_t & IBase refrence of dead serivce (unused).
+ *
+ * RETURN     : none
+ *==========================================================================*/
+void
+QCameraDisplay::DeathRecipient::serviceDied(uint64_t /*cookie*/,
+                                const wp<android::hidl::base::V1_0::IBase>& /*who*/)
+{
+    if(mCameraDisplay && mCameraDisplay->m_bInitDone)
+    {
+        mCameraDisplay->m_bInitDone = false;
+        mCameraDisplay->m_bSyncing = false;
+        mCameraDisplay->mDisplayEventReceiver.clear();
+        mCameraDisplay->mDisplayService.clear();
+        mCameraDisplay->mDisplayEventCallback.clear();
+        mCameraDisplay->mDeathRecipient.clear();
+        mCameraDisplay->mDeathRecipient = nullptr;
+        mCameraDisplay->mDisplayEventCallback = nullptr;
+        mCameraDisplay->mDisplayEventReceiver = nullptr;
+        mCameraDisplay->mDisplayService = nullptr;
+    }
+}
 #endif //USE_DISPLAY_SERVICE
 
 /*===========================================================================
@@ -139,9 +225,9 @@ QCameraDisplay::QCameraDisplay()
       mVsyncHistoryIndex(0),
       mAdditionalVsyncOffsetForWiggle(0),
       mNum_vsync_from_vfe_isr_to_presentation_timestamp(0),
-      mSet_timestamp_num_ms_prior_to_vsync(0),
-      mVfe_and_mdp_freq_wiggle_filter_max_ms(0),
-      mVfe_and_mdp_freq_wiggle_filter_min_ms(0),
+      mSet_timestamp_num_ns_prior_to_vsync(0),
+      mVfe_and_mdp_freq_wiggle_filter_max_ns(0),
+      mVfe_and_mdp_freq_wiggle_filter_min_ns(0),
 #ifndef USE_DISPLAY_SERVICE
       mThreadExit(0)
 #else //USE_DISPLAY_SERVICE
@@ -152,26 +238,28 @@ QCameraDisplay::QCameraDisplay()
 #ifdef USE_DISPLAY_SERVICE
     mDisplayService = nullptr;
     mDisplayEventReceiver = nullptr;
+    mDeathRecipient = nullptr;
+    mDisplayEventCallback = nullptr;
 #else //USE_DISPLAY_SERVICE
     int rc = NO_ERROR;
 
     memset(&mVsyncIntervalHistory, 0, sizeof(mVsyncIntervalHistory));
     rc = pthread_create(&mVsyncThreadCameraHandle, NULL, vsyncThreadCamera, (void *)this);
     if (rc == NO_ERROR) {
-        pthread_setname_np(mVsyncThreadCameraHandle, "CAM_Vsync_Thread");
+        pthread_setname_np(mVsyncThreadCameraHandle, "CAM_Vsync");
 #endif //USE_DISPLAY_SERVICE
         char  value[PROPERTY_VALUE_MAX];
         nsecs_t default_vsync_interval;
         // Read a list of properties used for tuning
-        property_get("persist.camera.disp.num_vsync", value, "4");
+        property_get("persist.vendor.camera.disp.num_vsync", value, "4");
         mNum_vsync_from_vfe_isr_to_presentation_timestamp = atoi(value);
-        property_get("persist.camera.disp.ms_to_vsync", value, "2");
-        mSet_timestamp_num_ms_prior_to_vsync = atoi(value);
-        property_get("persist.camera.disp.filter_max", value, "2");
-        mVfe_and_mdp_freq_wiggle_filter_max_ms = atoi(value);
-        property_get("persist.camera.disp.filter_min", value, "4");
-        mVfe_and_mdp_freq_wiggle_filter_min_ms = atoi(value);
-        property_get("persist.camera.disp.fps", value, "60");
+        property_get("persist.vendor.camera.disp.ms_to_vsync", value, "2");
+        mSet_timestamp_num_ns_prior_to_vsync = atoi(value) * NSEC_PER_MSEC;
+        property_get("persist.vendor.camera.disp.filter_max", value, "2");
+        mVfe_and_mdp_freq_wiggle_filter_max_ns = atoi(value) * NSEC_PER_MSEC;
+        property_get("persist.vendor.camera.disp.filter_min", value, "4");
+        mVfe_and_mdp_freq_wiggle_filter_min_ns = atoi(value) * NSEC_PER_MSEC;
+        property_get("persist.vendor.camera.disp.fps", value, "60");
         if (atoi(value) > 0) {
             default_vsync_interval= s2ns(1) / atoi(value);
         } else {
@@ -181,13 +269,13 @@ QCameraDisplay::QCameraDisplay()
             mVsyncIntervalHistory[i] = default_vsync_interval;
         }
         LOGD("display jitter num_vsync_from_vfe_isr_to_presentation_timestamp %u \
-                set_timestamp_num_ms_prior_to_vsync %u",
+                set_timestamp_num_ns_prior_to_vsync %llu",
                 mNum_vsync_from_vfe_isr_to_presentation_timestamp,
-                mSet_timestamp_num_ms_prior_to_vsync);
-        LOGD("display jitter vfe_and_mdp_freq_wiggle_filter_max_ms %u \
-                vfe_and_mdp_freq_wiggle_filter_min_ms %u",
-                mVfe_and_mdp_freq_wiggle_filter_max_ms,
-                mVfe_and_mdp_freq_wiggle_filter_min_ms);
+                mSet_timestamp_num_ns_prior_to_vsync);
+        LOGD("display jitter vfe_and_mdp_freq_wiggle_filter_max_ns %llu \
+                vfe_and_mdp_freq_wiggle_filter_min_ns %llu",
+                mVfe_and_mdp_freq_wiggle_filter_max_ns,
+                mVfe_and_mdp_freq_wiggle_filter_min_ns);
 #ifndef USE_DISPLAY_SERVICE
       } else {
           mVsyncThreadCameraHandle = 0;
@@ -206,7 +294,17 @@ QCameraDisplay::QCameraDisplay()
  *==========================================================================*/
 QCameraDisplay::~QCameraDisplay()
 {
-#ifndef USE_DISPLAY_SERVICE
+#ifdef USE_DISPLAY_SERVICE
+    if(mDisplayEventReceiver != nullptr)
+    {
+        mDisplayEventReceiver->close();
+    }
+    mDisplayEventCallback.clear();
+    mDeathRecipient.clear();
+    mDisplayEventReceiver.clear();
+    mDisplayService.clear();
+    mRegistrationCB.clear();
+#else
     mThreadExit = 1;
     if (mVsyncThreadCameraHandle != 0) {
         pthread_join(mVsyncThreadCameraHandle, NULL);
@@ -245,6 +343,17 @@ QCameraDisplay::init()
       return;
     }
 
+    if(mDisplayEventCallback == nullptr)
+    {
+        mDisplayEventCallback = new DisplayEventCallback();
+    }
+
+    if(mDeathRecipient == nullptr)
+    {
+        mDeathRecipient = new DeathRecipient();
+    }
+
+    mDisplayService->linkToDeath(mDeathRecipient,0);
     m_bInitDone = true;
 
 }
@@ -269,14 +378,15 @@ QCameraDisplay::startVsync(bool bStart)
 
     if(bStart)
     {
-        Return<Status> retVal = mDisplayEventReceiver->init(this /*setting callbacks*/ );
-        if(!retVal.isOk() || (Status::SUCCESS != static_cast<Status>(retVal)) )
-        {
-            LOGE("Failed to register display vsync callback");
-            return false;
-        }
-
-        retVal = mDisplayEventReceiver->setVsyncRate(1 /*send callback after this many events*/);
+         /*setting callbacks*/
+         Return<Status> retVal = mDisplayEventReceiver->init(mDisplayEventCallback);
+         if(!retVal.isOk() || (Status::SUCCESS != static_cast<Status>(retVal)) )
+         {
+             LOGE("Failed to register display vsync callback");
+             return false;
+         }
+        /*send callback for each vsync event*/
+        retVal = mDisplayEventReceiver->setVsyncRate(1);
         if(!retVal.isOk() || (Status::SUCCESS != static_cast<Status>(retVal)) )
         {
             LOGE("Failed to start vsync events");
@@ -285,10 +395,18 @@ QCameraDisplay::startVsync(bool bStart)
     }
     else
     {
-        Return<Status> retVal = mDisplayEventReceiver->setVsyncRate(0 /*send callback after this many events*/);
+        /*disabling sending callback for vsync event*/
+        Return<Status> retVal = mDisplayEventReceiver->setVsyncRate(0);
         if(!retVal.isOk() || (Status::SUCCESS != static_cast<Status>(retVal)) )
         {
             LOGE("Failed to stop vsync events");
+            return false;
+        }
+        /*Disable callbacks*/
+        retVal = mDisplayEventReceiver->close();
+        if(!retVal.isOk() || (Status::SUCCESS != static_cast<Status>(retVal)))
+        {
+            LOGE("Failed to disable vsync callback");
             return false;
         }
     }
@@ -375,11 +493,11 @@ nsecs_t QCameraDisplay::computePresentationTimeStamp(nsecs_t frameTimeStamp)
                 (mNum_vsync_from_vfe_isr_to_presentation_timestamp * mAvgVsyncInterval);
         if (presentationTimeStamp > mVsyncTimeStamp) {
             timeDifference      = presentationTimeStamp - mVsyncTimeStamp;
-            moveToNextVsync     = mAvgVsyncInterval - mVfe_and_mdp_freq_wiggle_filter_min_ms;
-            keepInCurrentVsync  = mAvgVsyncInterval - mVfe_and_mdp_freq_wiggle_filter_max_ms;
+            moveToNextVsync     = mAvgVsyncInterval - mVfe_and_mdp_freq_wiggle_filter_min_ns;
+            keepInCurrentVsync  = mAvgVsyncInterval - mVfe_and_mdp_freq_wiggle_filter_max_ns;
             vsyncOffset         = timeDifference % mAvgVsyncInterval;
             expectedVsyncOffset = mAvgVsyncInterval -
-                    mSet_timestamp_num_ms_prior_to_vsync - vsyncOffset;
+                    mSet_timestamp_num_ns_prior_to_vsync - vsyncOffset;
             if (vsyncOffset > moveToNextVsync) {
                 mAdditionalVsyncOffsetForWiggle = mAvgVsyncInterval;
             } else if (vsyncOffset < keepInCurrentVsync) {

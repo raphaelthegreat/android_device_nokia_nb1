@@ -28,19 +28,12 @@ DEVICE_PACKAGE_OVERLAYS += \
 PRODUCT_PACKAGES += \
     init.fih.elabel.rc \
     init.fih.fqcaudio.rc \
-    init.nb1.battery.rc \
-    init.nb1.camera.rc \
     init.nb1.dbg.rc \
     init.nb1.fingerprint.rc \
-    init.nb1.lcm.rc \
     init.nb1.led.rc \
-    init.nb1.poweroff_charging.rc \
-    init.nb1.sd.rc \
     init.nb1.smartamp.rc \
     init.nb1.target.rc \
-    init.nb1.touch.rc \
-    init.nb1.wbg.rc \
-    init.nfc.nxp.rc
+    init.nb1.wbg.rc
 
 PRODUCT_PACKAGES += \
     init.nb1.lcm.sh \
@@ -54,7 +47,14 @@ PRODUCT_PACKAGES += \
 
 # Camera
 PRODUCT_PACKAGES += \
-    camera.msm8998
+    camera.msm8998 \
+    libmm-qcamera \
+    mm-qcamera-app \
+    libmmlib2d_interface
+
+# qcmetadataprinter
+PRODUCT_PACKAGES += \
+    get_offsets
 
 # Get non-open-source specific aspects
 $(call inherit-product, vendor/nokia/NB1/NB1-vendor.mk)

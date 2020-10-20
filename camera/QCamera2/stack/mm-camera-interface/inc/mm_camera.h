@@ -37,6 +37,7 @@
 #include "hardware/camera_common.h"
 #include "cam_semaphore.h"
 #include "mm_camera_interface.h"
+#include "mm_camera_shim.h"
 
 /**********************************************************************************
 * Data structure declarations
@@ -57,6 +58,12 @@
 * settings can be applied and small enough to still capture an image */
 #define MM_CAMERA_MAX_FUTURE_FRAME_WAIT 100
 #define WAIT_TIMEOUT 5
+
+/*For frame sync */
+#define MAX_OBJS_FOR_FRAME_SYNC   4
+
+/* num of supporting camera*/
+#define MM_CAMERA_MAX_AUX_CAMERA 1
 
 #ifndef TRUE
 #define TRUE 1
@@ -207,6 +214,9 @@ typedef enum {
     MM_STREAM_EVT_GET_PARM,
     MM_STREAM_EVT_DO_ACTION,
     MM_STREAM_EVT_GET_QUEUED_BUF_COUNT,
+    MM_STREAM_EVT_REG_FRAME_SYNC,
+    MM_STREAM_EVT_TRIGGER_FRAME_SYNC,
+    MM_STREAM_EVT_CANCEL_BUF,
     MM_STREAM_EVT_MAX
 } mm_stream_evt_type_t;
 
@@ -235,6 +245,47 @@ typedef struct {
     int8_t map_status;
 } mm_stream_buf_status_t;
 
+/*Structure definition to carry frame sync queue details*/
+typedef struct {
+    /*Number of objects to be synced*/
+    uint8_t num_objs;
+    /*Object handle to be synced*/
+    uint32_t bundled_objs[MAX_OBJS_FOR_FRAME_SYNC];
+    /*Queue*/
+    cam_queue_t que;
+
+    /*queue attributed*/
+    mm_camera_channel_attr_t attr;
+
+    /*Expected frame for this queue*/
+    uint32_t expected_frame_id;
+
+    /*Total match count*/
+    uint32_t match_cnt;
+} mm_frame_sync_queue_t;
+
+/*Structure definition to carry frame sync details*/
+typedef struct {
+    /* flag to indicate if frame sync is active*/
+    uint8_t is_active;
+
+    /*Frame sync lock. Shared between child and parent stream*/
+    pthread_mutex_t sync_lock;
+
+    /*Limited number of synced frame request*/
+    mm_camera_req_buf_t req_buf;
+
+    /*Queue to hold super buffers*/
+    mm_frame_sync_queue_t superbuf_queue;
+
+    /*Callback registered for synced frame*/
+    mm_camera_buf_notify_t super_buf_notify_cb;
+
+    /*Client data*/
+    void *user_data;
+} mm_frame_sync_t;
+
+struct mm_stream;
 typedef struct mm_stream {
     uint32_t my_hdl; /* local stream id */
     uint32_t server_stream_id; /* stream id from server */
@@ -254,12 +305,16 @@ typedef struct mm_stream {
     mm_camera_cmd_thread_t cmd_thread;
 
     /* dataCB registered on this stream obj */
+    uint8_t is_cb_active;
     pthread_mutex_t cb_lock; /* cb lock to protect buf_cb */
     mm_stream_data_cb_t buf_cb[MM_CAMERA_STREAM_BUF_CB_MAX];
 
     /* stream buffer management */
     pthread_mutex_t buf_lock;
-    uint8_t buf_num; /* num of buffers allocated */
+    uint8_t total_buf_cnt; /*Total number of buffer including slave*/
+    uint8_t buf_num; /* num of buffers for this stream */
+    uint8_t buf_idx; /* starting buffer index */
+
     mm_camera_buf_def_t* buf; /* ptr to buf array */
     mm_stream_buf_status_t buf_status[CAM_MAX_NUM_BUFS_PER_STREAM]; /* ptr to buf status array */
 
@@ -267,7 +322,6 @@ typedef struct mm_stream {
     mm_camera_buf_def_t *plane_buf; /*Pointer to plane buffer array Used only in Batch mode */
     int32_t cur_buf_idx; /* Current container buffer active filling. Used only in Batch mode*/
     uint8_t cur_bufs_staged; /*Number of plane buf freed by HAL for this usr buf*/
-
 
     /* reference to parent channel_obj */
     struct mm_channel* ch_obj;
@@ -280,7 +334,6 @@ typedef struct mm_stream {
     uint8_t is_linked; /* flag if stream is linked */
 
     mm_camera_stream_mem_vtbl_t mem_vtbl; /* mem ops tbl */
-
     mm_camera_map_unmap_ops_tbl_t map_ops;
 
     int8_t queued_buffer_count;
@@ -291,6 +344,14 @@ typedef struct mm_stream {
 
     /* Need to wait for buffer mapping before stream-on*/
     pthread_cond_t buf_cond;
+
+    struct mm_stream *master_str_obj; /*Master stream of this stream*/
+    uint8_t num_s_cnt;
+    struct mm_stream *aux_str_obj[MM_CAMERA_MAX_AUX_CAMERA];  /*aux stream of this stream*/
+    mm_frame_sync_t frame_sync;
+    uint8_t is_res_shared;
+    uint8_t is_deferred;
+    uint8_t is_frame_shared;
 } mm_stream_t;
 
 /* mm_channel */
@@ -322,7 +383,7 @@ typedef enum {
     MM_CHANNEL_EVT_UNMAP_STREAM_BUF,
     MM_CHANNEL_EVT_SET_STREAM_PARM,
     MM_CHANNEL_EVT_GET_STREAM_PARM,
-    MM_CHANNEL_EVT_DO_STREAM_ACTION,
+    MM_CHANNEL_EVT_DO_ACTION,
     MM_CHANNEL_EVT_DELETE,
     MM_CHANNEL_EVT_AF_BRACKETING,
     MM_CHANNEL_EVT_AE_BRACKETING,
@@ -331,7 +392,9 @@ typedef enum {
     MM_CAMERA_EVT_CAPTURE_SETTING,
     MM_CHANNEL_EVT_GET_STREAM_QUEUED_BUF_COUNT,
     MM_CHANNEL_EVT_MAP_STREAM_BUFS,
-    MM_CHANNEL_EVT_REG_STREAM_BUF_CB
+    MM_CHANNEL_EVT_REG_STREAM_BUF_CB,
+    MM_CHANNEL_EVT_REG_FRAME_SYNC,
+    MM_CHANNEL_EVT_TRIGGER_FRAME_SYNC,
 } mm_channel_evt_type_t;
 
 typedef struct {
@@ -353,7 +416,6 @@ typedef struct {
     uint32_t stream_id;
     mm_stream_data_cb_t buf_cb;
 } mm_evt_paylod_reg_stream_buf_cb;
-
 
 typedef struct {
     uint8_t num_of_bufs;
@@ -385,6 +447,7 @@ typedef struct {
 typedef struct {
     uint8_t is_active; /* flag to indicate if bundle is valid */
     /* queue to store bundled super buffers */
+    uint8_t is_cb_active;
     mm_channel_queue_t superbuf_queue;
     mm_camera_buf_notify_t super_buf_notify_cb;
     void *user_data;
@@ -431,6 +494,7 @@ typedef enum {
     MM_CHANNEL_BRACKETING_STATE_ACTIVE,
 } mm_channel_bracketing_state_t;
 
+struct mm_channel;
 typedef struct mm_channel {
     uint32_t my_hdl;
     mm_channel_state_type_t state;
@@ -487,6 +551,19 @@ typedef struct mm_channel {
     uint32_t capture_frame_id[MAX_CAPTURE_BATCH_NUM];
     cam_capture_frame_config_t frameConfig;
     uint8_t needLowLightZSL;
+
+    /*Capture based on index*/
+    uint8_t cur_req_idx;
+    uint8_t frame_req_cnt;
+    uint32_t requested_frame_id[MAX_CAPTURE_BATCH_NUM];
+
+    /*For channel frame sync*/
+    mm_frame_sync_t frame_sync;
+
+    /*Multiple camera's*/
+    struct mm_channel *master_ch_obj; /*Master channel of this channel*/
+    uint8_t num_s_cnt;
+    struct mm_channel *aux_ch_obj[MM_CAMERA_MAX_AUX_CAMERA];  /*Slave channel of this channel*/
 } mm_channel_t;
 
 typedef struct {
@@ -499,7 +576,7 @@ typedef struct {
     uint32_t cam_hdl;
     uint32_t ch_hdl;
     uint32_t stream_hdl;
-    mm_channel_queue_node_t* super_buf;
+    mm_channel_queue_node_t *super_buf;
 } mm_channel_pp_info_t;
 
 /* mm_camera */
@@ -515,6 +592,7 @@ typedef struct {
     int reg_count;
 } mm_camera_evt_obj_t;
 
+struct mm_camera_obj;
 typedef struct mm_camera_obj {
     uint32_t my_hdl;
     int ref_count;
@@ -534,16 +612,25 @@ typedef struct mm_camera_obj {
 
     pthread_mutex_t msg_lock; /* lock for sending msg through socket */
     uint32_t sessionid; /* Camera server session id */
+
+    uint8_t my_num;          /*this camera position in multi mode*/
+    pthread_mutex_t muxer_lock;
+    struct mm_camera_obj *master_cam_obj; /*Master Camera of this camera*/
+    uint8_t num_s_cnt;
+    struct mm_camera_obj *aux_cam_obj[MM_CAMERA_MAX_AUX_CAMERA];  /*Slave Camera of this camera*/
 } mm_camera_obj_t;
 
 typedef struct {
     int8_t num_cam;
+    mm_camera_shim_ops_t cam_shim_ops;
+    int8_t num_cam_to_expose;
     char video_dev_name[MM_CAMERA_MAX_NUM_SENSORS][MM_CAMERA_DEV_NAME_LEN];
     mm_camera_obj_t *cam_obj[MM_CAMERA_MAX_NUM_SENSORS];
     struct camera_info info[MM_CAMERA_MAX_NUM_SENSORS];
     cam_sync_type_t cam_type[MM_CAMERA_MAX_NUM_SENSORS];
     cam_sync_mode_t cam_mode[MM_CAMERA_MAX_NUM_SENSORS];
     uint8_t is_yuv[MM_CAMERA_MAX_NUM_SENSORS]; // 1=CAM_SENSOR_YUV, 0=CAM_SENSOR_RAW
+    uint32_t cam_index[MM_CAMERA_MAX_NUM_SENSORS]; //Actual cam index are stored in bits
 } mm_camera_ctrl_t;
 
 typedef enum {
@@ -551,19 +638,44 @@ typedef enum {
     mm_camera_sync_call
 } mm_camera_call_type_t;
 
+/*internal structure for registring frame sync*/
+typedef struct {
+    mm_camera_obj_t *a_cam_obj;
+    uint32_t a_ch_id;
+    uint32_t a_stream_id;
+    uint8_t is_active;
+    mm_camera_channel_attr_t attr;
+    mm_camera_buf_notify_t buf_cb;
+    uint8_t is_res_shared;
+    void *userdata;
+} mm_camera_frame_sync_t;
+
+/*Payload for reg frame sync event in MCI*/
+typedef struct {
+    uint32_t stream_id;
+    mm_channel_t *a_ch_obj;
+    mm_stream_t *a_str_obj;
+    mm_camera_frame_sync_t *sync_attr;
+} mm_evt_paylod_reg_frame_sync;
+
+/*Payload to handle frame sync */
+typedef struct {
+    uint32_t stream_id;
+    mm_camera_cb_req_type type;
+} mm_evt_paylod_trigger_frame_sync;
+
+
 /**********************************************************************************
 * external function declare
 ***********************************************************************************/
 /* utility functions */
 /* set int32_t value */
-extern int32_t mm_camera_util_s_ctrl(int32_t fd,
-                                     uint32_t id,
-                                     int32_t *value);
+extern int32_t mm_camera_util_s_ctrl(mm_camera_obj_t *my_obj,
+        int stream_id, int32_t fd, uint32_t id, int32_t *value);
 
 /* get int32_t value */
-extern int32_t mm_camera_util_g_ctrl(int32_t fd,
-                                     uint32_t id,
-                                     int32_t *value);
+extern int32_t mm_camera_util_g_ctrl(mm_camera_obj_t *my_obj,
+        int stream_id, int32_t fd, uint32_t id, int32_t *value);
 
 /* send msg throught domain socket for fd mapping */
 extern int32_t mm_camera_util_sendmsg(mm_camera_obj_t *my_obj,
@@ -590,6 +702,10 @@ extern int32_t mm_camera_register_event_notify(mm_camera_obj_t *my_obj,
 extern int32_t mm_camera_qbuf(mm_camera_obj_t *my_obj,
                               uint32_t ch_id,
                               mm_camera_buf_def_t *buf);
+extern int32_t mm_camera_cancel_buf(mm_camera_obj_t *my_obj,
+                       uint32_t ch_id,
+                       uint32_t stream_id,
+                       uint32_t buf_idx);
 extern int32_t mm_camera_get_queued_buf_count(mm_camera_obj_t *my_obj,
         uint32_t ch_id, uint32_t stream_id);
 extern int32_t mm_camera_query_capability(mm_camera_obj_t *my_obj);
@@ -600,7 +716,8 @@ extern int32_t mm_camera_get_parms(mm_camera_obj_t *my_obj,
 extern int32_t mm_camera_map_buf(mm_camera_obj_t *my_obj,
                                  uint8_t buf_type,
                                  int fd,
-                                 size_t size);
+                                 size_t size,
+                                 void *buffer);
 extern int32_t mm_camera_map_bufs(mm_camera_obj_t *my_obj,
                                   const cam_buf_map_type_list *buf_map_list);
 extern int32_t mm_camera_unmap_buf(mm_camera_obj_t *my_obj,
@@ -638,7 +755,6 @@ extern uint32_t mm_camera_link_stream(mm_camera_obj_t *my_obj,
 extern int32_t mm_camera_reg_stream_buf_cb(mm_camera_obj_t *my_obj,
         uint32_t ch_id, uint32_t stream_id, mm_camera_buf_notify_t buf_cb,
         mm_camera_stream_cb_type cb_type, void *userdata);
-
 extern int32_t mm_camera_config_stream(mm_camera_obj_t *my_obj,
                                        uint32_t ch_id,
                                        uint32_t stream_id,
@@ -675,7 +791,8 @@ extern int32_t mm_camera_map_stream_buf(mm_camera_obj_t *my_obj,
                                         uint32_t buf_idx,
                                         int32_t plane_idx,
                                         int fd,
-                                        size_t size);
+                                        size_t size,
+                                        void *buffer);
 extern int32_t mm_camera_map_stream_bufs(mm_camera_obj_t *my_obj,
                                          uint32_t ch_id,
                                          const cam_buf_map_type_list *buf_map_list);
@@ -691,8 +808,12 @@ extern int32_t mm_camera_do_stream_action(mm_camera_obj_t *my_obj,
                                           void *actions);
 extern int32_t mm_camera_get_session_id(mm_camera_obj_t *my_obj,
                                         uint32_t* sessionid);
-extern int32_t mm_camera_sync_related_sensors(mm_camera_obj_t *my_obj,
-                                   cam_sync_related_sensors_event_info_t *parms);
+extern int32_t mm_camera_set_dual_cam_cmd(mm_camera_obj_t *my_obj);
+extern int32_t mm_camera_reg_frame_sync(mm_camera_obj_t *my_obj,
+        uint32_t ch_id, uint32_t stream_id,
+        mm_camera_frame_sync_t *sync_attr);
+extern int32_t mm_camera_handle_frame_sync_cb(mm_camera_obj_t *my_obj,
+        uint32_t ch_id, uint32_t stream_id, mm_camera_cb_req_type req_type);
 
 /* mm_channel */
 extern int32_t mm_channel_fsm_fn(mm_channel_t *my_obj,
@@ -708,6 +829,8 @@ extern int32_t mm_channel_init(mm_channel_t *my_obj,
  * from the context of dataCB, but async stop is holding ch_lock */
 extern int32_t mm_channel_qbuf(mm_channel_t *my_obj,
                                mm_camera_buf_def_t *buf);
+extern int32_t mm_channel_cancel_buf(mm_channel_t *my_obj,
+                        uint32_t stream_id, uint32_t buf_idx);
 /* mm_stream */
 extern int32_t mm_stream_fsm_fn(mm_stream_t *my_obj,
                                 mm_stream_evt_type_t evt,
@@ -721,7 +844,8 @@ extern int32_t mm_stream_map_buf(mm_stream_t *my_obj,
                                  uint32_t frame_idx,
                                  int32_t plane_idx,
                                  int fd,
-                                 size_t size);
+                                 size_t size,
+                                 void *buffer);
 extern int32_t mm_stream_map_bufs(mm_stream_t *my_obj,
                                   const cam_buf_map_type_list *buf_map_list);
 extern int32_t mm_stream_unmap_buf(mm_stream_t *my_obj,
@@ -729,11 +853,10 @@ extern int32_t mm_stream_unmap_buf(mm_stream_t *my_obj,
                                    uint32_t frame_idx,
                                    int32_t plane_idx);
 
-
 /* utiltity fucntion declared in mm-camera-inteface2.c
  * and need be used by mm-camera and below*/
 uint32_t mm_camera_util_generate_handler(uint8_t index);
-const char * mm_camera_util_get_dev_name(uint32_t cam_handler);
+const char *mm_camera_util_get_dev_name(uint32_t cam_handler);
 uint8_t mm_camera_util_get_index_by_handler(uint32_t handler);
 
 /* poll/cmd thread functions */
@@ -742,16 +865,12 @@ extern int32_t mm_camera_poll_thread_launch(
                                 mm_camera_poll_thread_type_t poll_type);
 extern int32_t mm_camera_poll_thread_release(mm_camera_poll_thread_t *poll_cb);
 extern int32_t mm_camera_poll_thread_add_poll_fd(
-                                mm_camera_poll_thread_t * poll_cb,
-                                uint32_t handler,
-                                int32_t fd,
-                                mm_camera_poll_notify_t nofity_cb,
-                                void *userdata,
-                                mm_camera_call_type_t);
+        mm_camera_poll_thread_t * poll_cb, uint8_t idx, uint32_t handler,
+        int32_t fd, mm_camera_poll_notify_t nofity_cb,
+        void *userdata, mm_camera_call_type_t);
 extern int32_t mm_camera_poll_thread_del_poll_fd(
-                                mm_camera_poll_thread_t * poll_cb,
-                                uint32_t handler,
-                                mm_camera_call_type_t);
+        mm_camera_poll_thread_t * poll_cb, uint8_t idx, uint32_t handler,
+        mm_camera_call_type_t);
 extern int32_t mm_camera_poll_thread_commit_updates(
         mm_camera_poll_thread_t * poll_cb);
 extern int32_t mm_camera_cmd_thread_launch(
@@ -764,4 +883,17 @@ extern int32_t mm_camera_cmd_thread_release(mm_camera_cmd_thread_t * cmd_thread)
 extern int32_t mm_camera_channel_advanced_capture(mm_camera_obj_t *my_obj,
         uint32_t ch_id, mm_camera_advanced_capture_t type,
         uint32_t trigger, void *in_value);
+int32_t mm_camera_enqueue_evt(mm_camera_obj_t *my_obj,
+                              mm_camera_event_t *event);
+int32_t mm_camera_load_shim_lib();
+cam_shim_packet_t *mm_camera_create_shim_cmd_packet(cam_shim_cmd_type type,
+        uint32_t sessionID, void *data);
+int32_t mm_camera_destroy_shim_cmd_packet(cam_shim_packet_t *cmd);
+int32_t mm_camera_module_event_handler(
+        uint32_t session_id, cam_event_t *event);
+cam_status_t mm_camera_module_open_session(int sessionid,
+        int (*event_cb)(uint32_t sessionid, cam_event_t *event));
+int32_t mm_camera_module_close_session(int session);
+int32_t mm_camera_module_send_cmd(cam_shim_packet_t *event);
+
 #endif /* __MM_CAMERA_H__ */

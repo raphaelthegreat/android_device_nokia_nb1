@@ -43,6 +43,8 @@
 #include "QCamera3Mem.h"
 #include "QCameraTrace.h"
 
+#include "fdleak.h"
+
 extern "C" {
 #include "mm_camera_dbg.h"
 #include "mm_camera_interface.h"
@@ -104,6 +106,7 @@ QCamera3Memory::~QCamera3Memory()
  *==========================================================================*/
 int QCamera3Memory::cacheOpsInternal(uint32_t index, unsigned int cmd, void *vaddr)
 {
+    ATRACE_CALL();
     Mutex::Autolock lock(mLock);
 
     struct ion_flush_data cache_inv_data;
@@ -396,7 +399,7 @@ void *QCamera3HeapMemory::getPtrLocked(uint32_t index)
 {
     if (index >= mBufferCount) {
         LOGE("index out of bound");
-        return (void *)BAD_INDEX;
+        return NULL;
     }
     return mPtr[index];
 }
@@ -437,6 +440,7 @@ int32_t QCamera3HeapMemory::markFrameNumber(uint32_t index, uint32_t frameNumber
     return NO_ERROR;
 }
 
+
 /*===========================================================================
  * FUNCTION   : getFrameNumber
  *
@@ -468,6 +472,44 @@ int32_t QCamera3HeapMemory::getFrameNumber(uint32_t index)
 
     return mCurrentFrameNumbers[index];
 }
+
+
+/*===========================================================================
+ * FUNCTION   : getOldestFrameNumber
+ *
+ * DESCRIPTION: We use this to fetch the oldest frame number expected per FIFO
+ *
+ *
+ * PARAMETERS :
+ *
+ *
+ * RETURN     : int32_t frameNumber
+ *              negative failure
+ *==========================================================================*/
+int32_t QCamera3HeapMemory::getOldestFrameNumber(uint32_t &bufIndex)
+{
+    Mutex::Autolock lock(mLock);
+
+    int32_t oldest = INT_MAX;
+    bool empty = true;
+
+    for (uint32_t index = 0;
+            index < mBufferCount; index++) {
+        if (mMemInfo[index].handle) {
+            if ((empty) || (!empty && oldest > mCurrentFrameNumbers[index]
+                && mCurrentFrameNumbers[index] != -1)) {
+                oldest = mCurrentFrameNumbers[index];
+                bufIndex = index;
+            }
+            empty = false;
+        }
+    }
+    if (empty)
+        return -1;
+    else
+        return oldest;
+}
+
 
 /*===========================================================================
  * FUNCTION   : getBufferIndex
@@ -705,7 +747,7 @@ int QCamera3HeapMemory::getMatchBufIndex(void * /*object*/)
  * RETURN     : none
  *==========================================================================*/
 QCamera3GrallocMemory::QCamera3GrallocMemory(uint32_t startIdx)
-        : QCamera3Memory(), mStartIdx(startIdx)
+        : QCamera3Memory(), mStartIdx(startIdx), mMasterCam(CAM_TYPE_MAIN)
 {
     for (int i = 0; i < MM_CAMERA_MAX_NUM_FRAMES; i ++) {
         mBufferHandle[i] = NULL;
@@ -806,6 +848,10 @@ int QCamera3GrallocMemory::registerBuffer(buffer_handle_t *buffer,
             MAP_SHARED,
             mMemInfo[idx].fd, 0);
     if (vaddr == MAP_FAILED) {
+        LOGE("mmap failed");
+        /* we have to close the main_ion_fd when mmap fails*/
+        close(mMemInfo[idx].main_ion_fd);
+        mMemInfo[idx].main_ion_fd = -1;
         mMemInfo[idx].handle = 0;
         ret = NO_MEMORY;
     } else {
@@ -834,6 +880,9 @@ int32_t QCamera3GrallocMemory::unregisterBufferLocked(size_t idx)
 {
     munmap(mPtr[idx], mMemInfo[idx].size);
     mPtr[idx] = NULL;
+    /*This function is called to remove the fd from wrapper.
+    This will not close the fd.*/
+    remFdCheck(mMemInfo[idx].fd);
 
     struct ion_handle_data ion_handle;
     memset(&ion_handle, 0, sizeof(ion_handle));
@@ -1002,6 +1051,41 @@ int32_t QCamera3GrallocMemory::getFrameNumber(uint32_t index)
 }
 
 /*===========================================================================
+ * FUNCTION   : getOldestFrameNumber
+ *
+ * DESCRIPTION: We use this to fetch the oldest frame number expected per FIFO
+ *
+ *
+ * PARAMETERS :
+ *
+ *
+ * RETURN     : int32_t frameNumber
+ *              negative failure
+ *==========================================================================*/
+int32_t QCamera3GrallocMemory::getOldestFrameNumber(uint32_t &bufIndex)
+{
+    int32_t oldest = INT_MAX;
+    bool empty = true;
+    for (uint32_t index = mStartIdx;
+            index < MM_CAMERA_MAX_NUM_FRAMES; index++) {
+        if (mMemInfo[index].handle) {
+            if ((empty) ||
+                (!empty && oldest > mCurrentFrameNumbers[index]
+                && mCurrentFrameNumbers[index] != -1)) {
+                oldest = mCurrentFrameNumbers[index];
+                bufIndex = index;
+            }
+            empty = false;
+        }
+    }
+    if (empty)
+        return -1;
+    else
+        return oldest;
+}
+
+
+/*===========================================================================
  * FUNCTION   : getBufferIndex
  *
  * DESCRIPTION: We use this to fetch the buffer index for the request with
@@ -1040,6 +1124,10 @@ int32_t QCamera3GrallocMemory::getBufferIndex(uint32_t frameNumber)
  *==========================================================================*/
 int QCamera3GrallocMemory::cacheOps(uint32_t index, unsigned int cmd)
 {
+    int rc = 0;
+    bool needToInvalidate = false;
+    struct private_handle_t *privateHandle = NULL;
+
     if (index >= MM_CAMERA_MAX_NUM_FRAMES) {
         LOGE("Index out of bounds");
         return -1;
@@ -1050,7 +1138,23 @@ int QCamera3GrallocMemory::cacheOps(uint32_t index, unsigned int cmd)
         return BAD_INDEX;
     }
 
-    return cacheOpsInternal(index, cmd, mPtr[index]);
+    privateHandle = mPrivateHandle[index];
+    if (privateHandle != NULL){
+        if(privateHandle->flags &
+             (private_handle_t::PRIV_FLAGS_NON_CPU_WRITER)){
+               needToInvalidate = true;
+        }
+    }
+
+    LOGD("needToInvalidate %d buf idx %d", needToInvalidate, index);
+    if(((cmd == ION_IOC_INV_CACHES) || (cmd == ION_IOC_CLEAN_INV_CACHES))
+        && needToInvalidate) {
+        rc = cacheOpsInternal(index, cmd, mPtr[index]);
+    }
+    else if(cmd == ION_IOC_CLEAN_CACHES) {
+        rc = cacheOpsInternal(index, cmd, mPtr[index]);
+    }
+    return rc;
 }
 
 /*===========================================================================
@@ -1097,6 +1201,10 @@ int QCamera3GrallocMemory::getMatchBufIndex(void *object)
 int QCamera3GrallocMemory::getFreeIndexLocked()
 {
     int index = -1;
+    //Main session : 0 (infact maxHeapBuffers) to MM_CAMERA_MAX_NUM_FRAMES/2 -1
+    //Aux session  : MM_CAMERA_MAX_NUM_FRAMES/2 to MM_CAMERA_MAX_NUM_FRAMES -1
+    uint32_t startIdx =
+            (mMasterCam == CAM_TYPE_MAIN) ? mStartIdx : (mStartIdx + (MM_CAMERA_MAX_NUM_FRAMES/2));
 
     if (mBufferCount >= (MM_CAMERA_MAX_NUM_FRAMES - 1)) {
         LOGE("Number of buffers %d greater than what's supported %d",
@@ -1104,7 +1212,7 @@ int QCamera3GrallocMemory::getFreeIndexLocked()
         return index;
     }
 
-    for (size_t i = mStartIdx; i < MM_CAMERA_MAX_NUM_FRAMES; i++) {
+    for (size_t i = startIdx; i < MM_CAMERA_MAX_NUM_FRAMES; i++) {
         if (0 == mMemInfo[i].handle) {
             index = i;
             break;
@@ -1196,4 +1304,10 @@ void *QCamera3GrallocMemory::getBufferHandle(uint32_t index)
 
     return mBufferHandle[index];
 }
+
+void QCamera3GrallocMemory::switchMaster(uint32_t masterCam)
+{
+    mMasterCam = masterCam;
+}
+
 }; //namespace qcamera

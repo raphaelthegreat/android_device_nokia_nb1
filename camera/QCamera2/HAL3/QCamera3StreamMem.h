@@ -57,6 +57,7 @@ public:
     ssize_t getSize(uint32_t index);
     int invalidateCache(uint32_t index);
     int cleanInvalidateCache(uint32_t index);
+    int cleanCache(uint32_t index);
     int32_t getBufDef(const cam_frame_len_offset_t &offset,
             mm_camera_buf_def_t &bufDef, uint32_t index);
     void *getPtr(uint32_t index);
@@ -81,8 +82,11 @@ public:
     // Frame number getter and setter
     int32_t markFrameNumber(uint32_t index, uint32_t frameNumber);
     int32_t getFrameNumber(uint32_t index);
+    int32_t getOldestFrameNumber(uint32_t &index);
     int32_t getGrallocBufferIndex(uint32_t frameNumber);
     int32_t getHeapBufferIndex(uint32_t frameNumber);
+    int32_t getBufferIndex(uint32_t frameNumber);
+    void switchMaster(uint32_t masterCam);
 
 private:
     //variables

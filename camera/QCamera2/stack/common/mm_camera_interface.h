@@ -32,6 +32,8 @@
 
 // System dependencies
 #include <media/msmb_camera.h>
+#include <linux/media.h>
+
 
 // Camera dependencies
 #include "cam_intf.h"
@@ -39,6 +41,7 @@
 
 #define MM_CAMERA_MAX_NUM_SENSORS MSM_MAX_CAMERA_SENSORS
 #define MM_CAMERA_MAX_NUM_FRAMES CAM_MAX_NUM_BUFS_PER_STREAM
+
 /* num of channels allowed in a camera obj */
 #define MM_CAMERA_CHANNEL_MAX 16
 
@@ -47,6 +50,18 @@
         (typeof(size))(~(padding - 1)))
 
 #define CEIL_DIVISION(n, d) ((n+d-1)/d)
+
+/*Bit shift to reach next camera in camera handle*/
+#define MM_CAMERA_HANDLE_SHIFT_MASK       16
+#define MM_CAMERA_HANDLE_BIT_MASK         0x0000ffff
+
+typedef enum {
+    MM_CAMERA_TYPE_MAIN       = CAM_TYPE_MAIN,
+    MM_CAMERA_TYPE_AUX        = CAM_TYPE_AUX,
+} mm_camera_obj_type;
+
+#define MM_CAMERA_DUAL_CAM (MM_CAMERA_TYPE_MAIN | MM_CAMERA_TYPE_AUX)
+#define MM_CAMERA_MAX_CAM_CNT 2
 
 /** CAM_DUMP_TO_FILE:
  *  @filename: file name
@@ -120,6 +135,7 @@ typedef struct {
 *               mem allocation
 *    @mem_info : user specific pointer to additional mem info
 *    @flags:  v4l2_buffer flags, used to report error in data buffers
+*    @cache_flags: Stores cache related read/write flags
 **/
 typedef struct mm_camera_buf_def {
     uint32_t stream_id;
@@ -138,6 +154,7 @@ typedef struct mm_camera_buf_def {
     size_t frame_len;
     void *mem_info;
     uint32_t flags;
+    uint32_t cache_flags;
 } mm_camera_buf_def_t;
 
 /** mm_camera_super_buf_t: super buf structure for bundled
@@ -179,19 +196,11 @@ typedef struct {
     mm_camera_req_buf_type_t type;
     uint32_t num_buf_requested;
     uint32_t num_retro_buf_requested;
-    uint8_t primary_only;
+    uint8_t cam_num;    //Frame from which camera
+    uint32_t frame_idx; //Client can request frameId to pick from ZSL queue
 } mm_camera_req_buf_t;
 
-/** mm_camera_event_t: structure for event
-*    @server_event_type : event type from serer
-*    @status : status of an event, value could be
-*              CAM_STATUS_SUCCESS
-*              CAM_STATUS_FAILED
-**/
-typedef struct {
-    cam_event_type_t server_event_type;
-    uint32_t status;
-} mm_camera_event_t;
+typedef cam_event_t mm_camera_event_t;
 
 /** mm_camera_event_notify_t: function definition for event
 *   notify handling
@@ -219,12 +228,14 @@ typedef void (*mm_camera_buf_notify_t) (mm_camera_super_buf_t *bufs,
 *                   the index to plane (0..num_of_planes)
 *    @fd : file descriptor of the stream buffer
 *    @size: size of the stream buffer
+*    @buffer: Pointer to buffer to register
 *    @userdata : user data pointer
 **/
 typedef int32_t (*map_stream_buf_op_t) (uint32_t frame_idx,
                                         int32_t plane_idx,
                                         int fd,
                                         size_t size,
+                                        void *buffer,
                                         cam_mapping_buf_type type,
                                         void *userdata);
 
@@ -281,6 +292,7 @@ typedef struct {
                        void *user_data);
   int32_t (*invalidate_buf)(uint32_t index, void *user_data);
   int32_t (*clean_invalidate_buf)(uint32_t index, void *user_data);
+  int32_t (*clean_buf)(uint32_t index, void *user_data);
 } mm_camera_stream_mem_vtbl_t;
 
 /** mm_camera_stream_config_t: structure for stream
@@ -392,6 +404,33 @@ typedef struct {
     uint8_t user_expected_frame_id;
 } mm_camera_channel_attr_t;
 
+/** mm_camera_cb_req_type: Callback request type**/
+typedef enum {
+    MM_CAMERA_CB_REQ_TYPE_DEFAULT,
+    MM_CAMERA_CB_REQ_TYPE_SWITCH,
+    MM_CAMERA_CB_REQ_TYPE_FRAME_SYNC,
+    MM_CAMERA_CB_REQ_TYPE_ALL_CB,
+    MM_CAMERA_CB_REQ_TYPE_DEFER,
+    MM_CAMERA_CB_REQ_TYPE_SHARE_FRAME
+} mm_camera_cb_req_type;
+
+/** mm_camera_intf_cb_req_type: structure to request different mode of stream callback
+*    @camera_handle  : camera handle to be syced
+*    @ch_id          : channel id to be synced
+*    @stream_id      : stream id to be synced
+*    @max_unmatched_frames : Frames to wait for before frame callback
+*    @buf_cb         : callback. can be NULL. NULL uses already registered stream/channel cb
+*    @userdata       : client objects.
+**/
+typedef struct {
+    uint32_t camera_handle;
+    uint32_t ch_id;
+    uint32_t stream_id;
+    mm_camera_channel_attr_t attr;
+    mm_camera_buf_notify_t buf_cb;
+    void *userdata;
+} mm_camera_intf_frame_sync_t;
+
 typedef struct {
     /** query_capability: fucntion definition for querying static
      *                    camera capabilities
@@ -436,7 +475,8 @@ typedef struct {
     int32_t (*map_buf) (uint32_t camera_handle,
                         uint8_t buf_type,
                         int fd,
-                        size_t size);
+                        size_t size,
+                        void *buffer);
 
     /** map_bufs: function definition for mapping multiple camera buffers
      *           via domain socket
@@ -642,7 +682,8 @@ typedef struct {
                                uint32_t buf_idx,
                                int32_t plane_idx,
                                int fd,
-                               size_t size);
+                               size_t size,
+                               void *buffer);
 
     /** map_stream_bufs: function definition for mapping multiple
      *                 stream buffers via domain socket
@@ -745,6 +786,24 @@ typedef struct {
                      uint32_t ch_id,
                      mm_camera_buf_def_t *buf);
 
+    /** cancel_buffer: fucntion definition for recalling a frame
+     *        buffer from the kernel this is most likely when h/w
+     *        failed to use this buffer and dropped the frame we use
+     *        this API to recall the buffer and return it to the
+     *        framework
+     *    @camera_handle : camer handler
+     *    @ch_id : channel handler
+     *    @stream_id : stream handle
+     *    @buf : a frame buffer to be queued back to kernel
+     *  Return value: 0 -- success
+     *                -1 -- failure
+     **/
+    int32_t (*cancel_buffer) (uint32_t camera_handle,
+                     uint32_t ch_id,
+                     uint32_t stream_id,
+                     uint32_t buf_idx);
+
+
     /** get_queued_buf_count: fucntion definition for querying queued buf count
      *    @camera_handle : camer handler
      *    @ch_id : channel handler
@@ -829,16 +888,13 @@ typedef struct {
     int32_t (*get_session_id) (uint32_t camera_handle,
             uint32_t* sessionid);
 
-    /** sync_related_sensors: sends sync cmd
+    /** set_dual_cam_cmd: sends sync cmd
       *    @camera_handle : camera handle
-      *    @related_cam_info : related cam info to be sent to server
       *     Return value: 0 -- success
       *                -1 -- failure
       *  Note: if this call succeeds, we will get linking established in back end
       **/
-     int32_t (*sync_related_sensors) (uint32_t camera_handle,
-            cam_sync_related_sensors_event_info_t*
-            related_cam_info);
+     int32_t (*set_dual_cam_cmd)(uint32_t camera_handle);
     /** flush: function definition for flush
      *  @camera_handle: camera handler
      *  Return value: 0 -- success
@@ -859,6 +915,30 @@ typedef struct {
     int32_t (*register_stream_buf_cb) (uint32_t camera_handle,
             uint32_t ch_id, uint32_t stream_id, mm_camera_buf_notify_t buf_cb,
             mm_camera_stream_cb_type cb_type, void *userdata);
+
+   /** register_stream_frame_sync: fucntion definition for registering frame sync
+     *    @camera_handle : camer handler
+     *    @ch_id : channel handler
+     *    @stream_id : stream handler. Can be 0 to config only channel callback sync
+     *    @sync_attr : pointer to a stream sync configuration structure
+     *  Return value: 0 -- success
+     *                -1 -- failure
+     **/
+    int32_t (*register_frame_sync) (uint32_t camera_handle,
+            uint32_t ch_id, uint32_t stream_id,
+            mm_camera_intf_frame_sync_t *sync_attr);
+
+   /** handle_frame_sync_cb: function to handle frame sync
+     *    @camera_handle : camer handler
+     *    @ch_id : channel handler
+     *    @stream_id : stream handler
+     *    @req_type : Frame sync request type
+     *  Return value: 0 -- success
+     *                -1 -- failure
+     **/
+    int32_t (*handle_frame_sync_cb) (uint32_t camera_handle,
+            uint32_t ch_id, uint32_t stream_id,
+            mm_camera_cb_req_type req_type);
 } mm_camera_ops_t;
 
 /** mm_camera_vtbl_t: virtual table for camera operations
@@ -871,8 +951,11 @@ typedef struct {
     mm_camera_ops_t *ops;
 } mm_camera_vtbl_t;
 
-/* return number of cameras */
+/* return total number of cameras */
 uint8_t get_num_of_cameras();
+
+/* return number of cameras to expose*/
+uint8_t get_num_of_cameras_to_expose();
 
 /* return reference pointer of camera vtbl */
 int32_t camera_open(uint8_t camera_idx, mm_camera_vtbl_t **camera_obj);
@@ -883,8 +966,9 @@ int32_t mm_stream_calc_offset_preview(cam_stream_info_t *stream_info,
         cam_padding_info_t *padding,
         cam_stream_buf_plane_info_t *buf_planes);
 
-int32_t mm_stream_calc_offset_post_view(cam_format_t fmt,
+int32_t mm_stream_calc_offset_post_view(cam_stream_info_t *stream_info,
         cam_dimension_t *dim,
+        cam_padding_info_t *padding,
         cam_stream_buf_plane_info_t *buf_planes);
 
 int32_t mm_stream_calc_offset_snapshot(cam_format_t fmt,
@@ -897,8 +981,8 @@ int32_t mm_stream_calc_offset_raw(cam_format_t fmt,
         cam_padding_info_t *padding,
         cam_stream_buf_plane_info_t *buf_planes);
 
-int32_t mm_stream_calc_offset_video(cam_format_t fmt,
-        cam_dimension_t *dim,
+int32_t mm_stream_calc_offset_video(cam_stream_info_t *stream_info,
+        cam_padding_info_t *padding,
         cam_stream_buf_plane_info_t *buf_planes);
 
 int32_t mm_stream_calc_offset_metadata(cam_dimension_t *dim,
@@ -915,9 +999,30 @@ int32_t mm_stream_calc_offset_analysis(cam_format_t fmt,
         cam_stream_buf_plane_info_t *buf_planes);
 
 uint32_t mm_stream_calc_lcm (int32_t num1, int32_t num2);
-
 struct camera_info *get_cam_info(uint32_t camera_id, cam_sync_type_t *pCamType);
 
 uint8_t is_yuv_sensor(uint32_t camera_id);
+
+cam_sync_type_t get_cam_type(uint32_t camera_id);
+
+/*Dual camera related utility functions*/
+
+/*Query if it is dual camera mode based on the camera index*/
+uint8_t is_dual_camera_by_idx(uint32_t camera_id);
+
+/*Query if it is dual camera mode based on the camera/channel/stream handles*/
+uint8_t is_dual_camera_by_handle(uint32_t handle);
+
+/*Get Primary camera handle for camera/channel/stream*/
+uint32_t get_main_camera_handle(uint32_t handle);
+
+/*Get Auxilary camera handle for camera/channel/stream*/
+uint32_t get_aux_camera_handle(uint32_t handle);
+
+/*Validate 2 handle if it is belong to same instance of camera/channel/stream*/
+uint8_t validate_handle(uint32_t src_handle, uint32_t handle);
+
+int mm_camera_util_match_subdev_type(struct media_entity_desc entity,
+     uint32_t gid, uint32_t type);
 
 #endif /*__MM_CAMERA_INTERFACE_H__*/

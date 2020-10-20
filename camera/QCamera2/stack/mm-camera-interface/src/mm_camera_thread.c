@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2012-2017, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -34,10 +34,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/prctl.h>
-#include <unistd.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <poll.h>
-#include <unistd.h> // for write, read, usleep, pipe, ...
 #include <cam_semaphore.h>
 
 #include "mm_camera_dbg.h"
@@ -398,6 +397,7 @@ int32_t mm_camera_poll_thread_commit_updates(mm_camera_poll_thread_t * poll_cb)
  *
  * PARAMETERS :
  *   @poll_cb   : ptr to poll thread object
+ *   @idx       : Object index.
  *   @handler   : stream handle if channel data polling thread,
  *                0 if event polling thread
  *   @fd        : file descriptor need to be added into polling thread
@@ -408,22 +408,10 @@ int32_t mm_camera_poll_thread_commit_updates(mm_camera_poll_thread_t * poll_cb)
  * RETURN     : none
  *==========================================================================*/
 int32_t mm_camera_poll_thread_add_poll_fd(mm_camera_poll_thread_t * poll_cb,
-                                          uint32_t handler,
-                                          int32_t fd,
-                                          mm_camera_poll_notify_t notify_cb,
-                                          void* userdata,
-                                          mm_camera_call_type_t call_type)
+        uint8_t idx, uint32_t handler, int32_t fd, mm_camera_poll_notify_t notify_cb,
+        void* userdata, mm_camera_call_type_t call_type)
 {
     int32_t rc = -1;
-    uint8_t idx = 0;
-
-    if (MM_CAMERA_POLL_TYPE_DATA == poll_cb->poll_type) {
-        /* get stream idx from handler if CH type */
-        idx = mm_camera_util_get_index_by_handler(handler);
-    } else {
-        /* for EVT type, only idx=0 is valid */
-        idx = 0;
-    }
 
     if (MAX_STREAM_NUM_IN_BUNDLE > idx) {
         poll_cb->poll_entries[idx].fd = fd;
@@ -449,6 +437,7 @@ int32_t mm_camera_poll_thread_add_poll_fd(mm_camera_poll_thread_t * poll_cb,
  *
  * PARAMETERS :
  *   @poll_cb   : ptr to poll thread object
+ *   @idx       : Object index.
  *   @handler   : stream handle if channel data polling thread,
  *                0 if event polling thread
  *
@@ -457,19 +446,9 @@ int32_t mm_camera_poll_thread_add_poll_fd(mm_camera_poll_thread_t * poll_cb,
  *              -1 -- failure
  *==========================================================================*/
 int32_t mm_camera_poll_thread_del_poll_fd(mm_camera_poll_thread_t * poll_cb,
-                                          uint32_t handler,
-                                          mm_camera_call_type_t call_type)
+        uint8_t idx, uint32_t handler, mm_camera_call_type_t call_type)
 {
     int32_t rc = -1;
-    uint8_t idx = 0;
-
-    if (MM_CAMERA_POLL_TYPE_DATA == poll_cb->poll_type) {
-        /* get stream idx from handler if CH type */
-        idx = mm_camera_util_get_index_by_handler(handler);
-    } else {
-        /* for EVT type, only idx=0 is valid */
-        idx = 0;
-    }
 
     if ((MAX_STREAM_NUM_IN_BUNDLE > idx) &&
         (handler == poll_cb->poll_entries[idx].handler)) {
@@ -505,6 +484,7 @@ int32_t mm_camera_poll_thread_launch(mm_camera_poll_thread_t * poll_cb,
     int32_t rc = 0;
     size_t i = 0, cnt = 0;
     poll_cb->poll_type = poll_type;
+    pthread_condattr_t cond_attr;
 
     //Initialize poll_fds
     cnt = sizeof(poll_cb->poll_fds) / sizeof(poll_cb->poll_fds[0]);
@@ -531,8 +511,12 @@ int32_t mm_camera_poll_thread_launch(mm_camera_poll_thread_t * poll_cb,
          poll_cb->poll_type,
         poll_cb->pfds[0], poll_cb->pfds[1],poll_cb->timeoutms);
 
+    pthread_condattr_init(&cond_attr);
+    pthread_condattr_setclock(&cond_attr, CLOCK_MONOTONIC);
+
     pthread_mutex_init(&poll_cb->mutex, NULL);
-    pthread_cond_init(&poll_cb->cond_v, NULL);
+    pthread_cond_init(&poll_cb->cond_v, &cond_attr);
+    pthread_condattr_destroy(&cond_attr);
 
     /* launch the thread */
     pthread_mutex_lock(&poll_cb->mutex);
