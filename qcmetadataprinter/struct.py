@@ -1,4 +1,4 @@
-#!/bin/python
+#!/bin/python3
 
 with open('../camera/QCamera2/stack/common/cam_intf.h', 'r') as f:
     data = f.read()
@@ -14,15 +14,11 @@ metalist = list()
 for line in metadata:
     if (line.startswith('    INCLUDE')):
         foo = line.split(',')
-        foo[0] = foo[0].replace('INCLUDE', 'MACRO')
+        foo[0] = foo[0].replace('INCLUDE', 'PRINT')
         
-        metalist.append(foo[0] + ')')
+        metalist.append(foo[0] + ",    pMetadata);")
 
-with open('param_ids.h', 'w') as f:
-    f.write("#include <cam_intf.h>\n\n")
-    f.write("#define FOR_EVERY_PARAM_ID(MACRO) \\\n")
-
+with open('list.txt', 'w') as f:
     for item in metalist:
-        f.write("%s \\\n" % item)
-
+        f.write("%s\n" % item)
 f.closed

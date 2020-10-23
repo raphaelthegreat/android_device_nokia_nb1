@@ -50,7 +50,11 @@ PRODUCT_PACKAGES += \
     camera.msm8998 \
     libmm-qcamera \
     mm-qcamera-app \
-    libmmlib2d_interface
+    libhal_dbg
+
+# qcmetadataprinter
+PRODUCT_PACKAGES += \
+    get_offsets
 
 # Get non-open-source specific aspects
 $(call inherit-product, vendor/nokia/NB1/NB1-vendor.mk)
