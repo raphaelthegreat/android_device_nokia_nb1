@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2019, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are
@@ -1199,7 +1199,7 @@ int32_t QCamera3PostProcessor::processPPData(mm_camera_super_buf_t *frame,
     if (job->jpeg_settings == NULL )
     {
         //If needHALPP is true, checking for ouput jpeg settings != NULL
-        if(!hal_obj->needHALPP() || (job->ppOutput_jpeg_settings == NULL)) {
+        if(hal_obj->needHALPP() && (job->ppOutput_jpeg_settings == NULL) && isMpoEnabled()) {
             LOGE("Cannot find jpeg settings");
             return BAD_VALUE;
         }
@@ -1504,6 +1504,7 @@ void QCamera3PostProcessor::releaseMetadata(void *data, void *user_data)
     if (NULL != pme) {
         qcamera_hal3_meta_pp_buffer_t *buf  = (qcamera_hal3_meta_pp_buffer_t *)data;
         pme->m_parent->metadataBufDone((mm_camera_super_buf_t *)buf->metabuf);
+        free(buf);
     }
 }
 
@@ -2522,25 +2523,6 @@ int32_t QCamera3PostProcessor::encodeData(qcamera_hal3_jpeg_data_t *jpeg_job_dat
     if (hal_obj)
         hal_obj->get3AVersion(sw_version);
 
-    if(jpeg_job_data->src_reproc_frame != NULL)
-    {
-        if((m_parent->getMyHandle() == jpeg_job_data->src_reproc_frame->ch_id)
-                && (jpeg_job_data->src_reproc_frame->num_bufs != 0))
-        {
-            mm_camera_buf_def_t *buf = jpeg_job_data->src_reproc_frame->bufs[0];
-            if(buf->mem_info && (buf->stream_type == CAM_STREAM_TYPE_SNAPSHOT))
-            {
-                QCamera3StreamMem *memObj =
-                        (QCamera3StreamMem *)buf->mem_info;
-                int bufidx = buf->buf_idx;
-                jpg_job.encode_job.work_buf.buf_size = memObj->getSize(bufidx);
-                jpg_job.encode_job.work_buf.buf_vaddr = (uint8_t *)memObj->getPtr(bufidx);
-                jpg_job.encode_job.work_buf.fd = memObj->getFd(bufidx);
-                memObj->invalidateCache(bufidx);
-            }
-        }
-    }
-
     // get exif data
     QCamera3Exif *pJpegExifObj = getExifData(metadata, jpeg_settings,
             (needJpegExifRotation && hal_obj->useExifRotation()));
@@ -2883,32 +2865,6 @@ void *QCamera3PostProcessor::dataProcessRoutine(void *data)
                 pme->m_inputMetaQ.flush();
                 pme->m_jpegSettingsQ.flush();
 
-                while(pme->mReprocessNode.size())
-                {
-                    List<ReprocessBuffer>::iterator reprocData;
-                    reprocData = pme->mReprocessNode.begin();
-                    qcamera_hal3_pp_buffer_t *pp_buffer = reprocData->reprocBuf;
-                    qcamera_hal3_meta_pp_buffer_t *meta_pp_buffer = reprocData->metaBuffer;
-
-                    pme->mReprocessNode.erase(pme->mReprocessNode.begin());
-                    // free frame
-                    if (pp_buffer != NULL) {
-                        if (pp_buffer->input) {
-                            pme->releaseSuperBuf(pp_buffer->input);
-                            free(pp_buffer->input);
-                        }
-                        free(pp_buffer);
-                    }
-                    //free metadata
-                    if (NULL != meta_pp_buffer) {
-                        if(NULL != meta_pp_buffer->metabuf)
-                        {
-                            pme->m_parent->metadataBufDone(meta_pp_buffer->metabuf);
-                            free(meta_pp_buffer->metabuf);
-                        }
-                        free(meta_pp_buffer);
-                    }
-                }
                 // signal cmd is completed
                 cam_sem_post(&cmdThread->sync_sem);
                 pthread_mutex_lock(&pme->mHDRJobLock);
@@ -3070,7 +3026,7 @@ void *QCamera3PostProcessor::dataProcessRoutine(void *data)
                                 (QCamera3HardwareInterface*)pme->m_parent->mUserData;
                         if(hal_obj->isDualCamera() && jpeg_settings != NULL)
                         {
-                            if(jpeg_settings->image_type != CAM_HAL3_JPEG_TYPE_MAIN)
+                            if((jpeg_settings->image_type != CAM_HAL3_JPEG_TYPE_MAIN))
                             {
                                 ppOutput_jpeg_settings = jpeg_settings;
                                 jpeg_settings = (jpeg_settings_t *)pme->m_jpegSettingsQ.dequeue();
@@ -3291,9 +3247,7 @@ int32_t QCamera3PostProcessor::processHalPPData(qcamera_hal_pp_data_t *pData)
 
     LOGD("halPPAllocatedBuf = %d needEncode %d", pData->halPPAllocatedBuf, pData->needEncode);
 
-    if ((!pData->halPPAllocatedBuf && !pData->needEncode)
-                || ((jpeg_job->jpeg_settings == NULL)
-                || (jpeg_job->jpeg_settings->image_type == CAM_HAL3_JPEG_TYPE_AUX))) {
+    if ((!pData->halPPAllocatedBuf && !pData->needEncode)|| (jpeg_job->jpeg_settings == NULL)) {
         LOGH("No need to encode input buffer, just release it.");
         releaseJpegJobData(jpeg_job);
         free(jpeg_job);

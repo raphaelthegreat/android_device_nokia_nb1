@@ -308,31 +308,6 @@ bool QCameraCommon::isVideoUBWCEnabled()
 }
 
 /*===========================================================================
- * FUNCTION   : needHAL1Support
- *
- * DESCRIPTION: Function to check whether HAL1 is supported or not.
- *
- * PARAMETERS : None
- *
- * RETURN     : TRUE -- HAL1/HAL3 supported target.
- *              FALSE -- Only HAL3 supported target.
- *==========================================================================*/
-
-bool QCameraCommon::needHAL1Support()
-{
-#ifndef HAS_LOW_RAM
-    // QM215, QM2150 non-GO supports only HAL3
-    if ((is_target_QM215() || is_target_QM2150())) {
-        LOGI("ONLY HAL3 SUPPORTED");
-        return FALSE;
-    }
-#endif
-    // HAL1/HAL3 is supported
-    LOGI("HAL1/HAL3 IS SUPPORTED");
-    return TRUE;
-}
-
-/*===========================================================================
  * FUNCTION   : is_target_SDM450
  *
  * DESCRIPTION: Function to check whether target is sdm630 or not.
@@ -348,53 +323,6 @@ bool QCameraCommon::is_target_SDM450()
     return (parseHWID() == 338 || parseHWID() == 351);
 }
 
-/*===========================================================================
- * FUNCTION   : is_target_SDM429
- *
- * DESCRIPTION: Function to check whether target is sdm429 or not.
- *
- * PARAMETERS : None
- *
- * RETURN     : TRUE -- SDM429 target.
- *              FALSE -- Some other target.
- *==========================================================================*/
-
-bool QCameraCommon::is_target_SDM429()
-{
-    return (parseHWID() == 354);
-}
-
-/*===========================================================================
- * FUNCTION   : is_target_QM215
- *
- * DESCRIPTION: Function to check whether target is QM215  or not.
- *
- * PARAMETERS : None
- *
- * RETURN     : TRUE -- QM215 target.
- *              FALSE -- Some other target.
- *==========================================================================*/
-
-bool QCameraCommon::is_target_QM215()
-{
-    return (parseHWID() == 386);
-}
-
-/*===========================================================================
- * FUNCTION   : is_target_QM2150
- *
- * DESCRIPTION: Function to check whether target is QM2150  or not.
- *
- * PARAMETERS : None
- *
- * RETURN     : TRUE -- QM2150 target.
- *              FALSE -- Some other target.
- *==========================================================================*/
-
-bool QCameraCommon::is_target_QM2150()
-{
-    return (parseHWID() == 436);
-}
 
 /*===========================================================================
  * FUNCTION   : is_target_SDM630

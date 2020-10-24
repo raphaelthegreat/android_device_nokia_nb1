@@ -1048,6 +1048,7 @@ typedef struct {
 
     /* dual camera specific params */
     INCLUDE(CAM_INTF_PARM_RELATED_SENSORS_CALIBRATION,  cam_related_system_calibration_data_t, 1);
+    INCLUDE(FIH_RESERVED,                               uint8_t,                  2048);
     INCLUDE(CAM_INTF_META_AF_FOCAL_LENGTH_RATIO,        cam_focal_length_ratio_t, 1);
     INCLUDE(CAM_INTF_META_SNAP_CROP_INFO_SENSOR,        cam_stream_crop_info_t,   1);
     INCLUDE(CAM_INTF_META_SNAP_CROP_INFO_CAMIF,         cam_stream_crop_info_t,   1);
@@ -1191,7 +1192,6 @@ typedef struct {
     INCLUDE(CAM_INTF_META_DC_CAPTURE,                   uint8_t,                     1);
     INCLUDE(CAM_INTF_PARM_BOKEH_MODE,                   uint8_t,                     1);
     INCLUDE(CAM_INTF_META_USERZOOM,                     cam_zoom_info_t,             1);
-    INCLUDE(CAM_INTF_META_TUNING_PARAMS,                tuning_params_t,             1);
 } metadata_data_t;
 
 /* Update clear_metadata_buffer() function when a new is_xxx_valid is added to

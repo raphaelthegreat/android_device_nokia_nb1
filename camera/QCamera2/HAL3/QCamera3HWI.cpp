@@ -424,7 +424,7 @@ QCamera3HardwareInterface::QCamera3HardwareInterface(uint32_t cameraId,
       mRawDumpChannel(NULL),
       mDummyBatchChannel(NULL),
       mPerfLockMgr(),
-      m_thermalAdapter(QCameraThermalAdapter::getInstance()),
+      m_pFovControl(NULL),
       mChannelHandle(0),
       mFirstConfiguration(true),
       mFlush(false),
@@ -456,7 +456,6 @@ QCamera3HardwareInterface::QCamera3HardwareInterface(uint32_t cameraId,
       mStreamConfig(false),
       mCommon(),
       mQCFARawChannel(NULL),
-      m_pFovControl(NULL),
       mFirstFrameNumberInBatch(0),
       mNeedSensorRestart(false),
       mPreviewStarted(false),
@@ -733,6 +732,10 @@ QCamera3HardwareInterface::~QCamera3HardwareInterface()
             //send the last unconfigure
             cam_stream_size_info_t stream_config_info;
             memset(&stream_config_info, 0, sizeof(cam_stream_size_info_t));
+            stream_config_info.buffer_info.min_buffers = MIN_INFLIGHT_REQUESTS;
+            stream_config_info.buffer_info.max_buffers =
+                    m_bIs4KVideo ? 0 :
+                    m_bEis3PropertyEnabled ? MAX_VIDEO_BUFFERS : MAX_INFLIGHT_REQUESTS;
             clear_metadata_buffer(mParameters);
             ADD_SET_PARAM_ENTRY_TO_BATCH(mParameters, CAM_INTF_META_STREAM_INFO,
                     stream_config_info);
@@ -746,6 +749,10 @@ QCamera3HardwareInterface::~QCamera3HardwareInterface()
             if (isDualCamera()) {
                 cam_stream_size_info_t stream_config_info;
                 memset(&stream_config_info, 0, sizeof(cam_stream_size_info_t));
+                stream_config_info.buffer_info.min_buffers = MIN_INFLIGHT_REQUESTS;
+                stream_config_info.buffer_info.max_buffers =
+                        m_bIs4KVideo ? 0 :
+                        m_bEis3PropertyEnabled ? MAX_VIDEO_BUFFERS : MAX_INFLIGHT_REQUESTS;
                 clear_metadata_buffer(mAuxParameters);
                 ADD_SET_PARAM_ENTRY_TO_BATCH(mAuxParameters, CAM_INTF_META_STREAM_INFO,
                         stream_config_info);
@@ -869,32 +876,6 @@ void QCamera3HardwareInterface::camEvtHandle(uint32_t /*camera_handle*/,
 }
 
 /*===========================================================================
- * FUNCTION   : thermalEvtHandle
- *
- * DESCRIPTION: routine to handle thermal event notification
- *
- * PARAMETERS :
- *   @level      : thermal level
- *   @userdata   : userdata passed in during registration
- *   @data       : opaque data from thermal client
- *
- * RETURN     : int32_t type of status
- *              NO_ERROR  -- success
- *              none-zero failure code
- *==========================================================================*/
-int QCamera3HardwareInterface::thermalEvtHandle(
-        qcamera_thermal_level_enum_t *level, void *userdata, void *data)
-{
-    /* TODO: implementation for thermal events handling */
-
-    // Make sure thermal events are logged
-    LOGH(" level = %d, userdata = %p, data = %p",
-         *level, userdata, data);
-
-    return NO_ERROR;
-}
-
-/*===========================================================================
  * FUNCTION   : openCamera
  *
  * DESCRIPTION: open camera
@@ -939,9 +920,6 @@ int QCamera3HardwareInterface::openCamera(struct hw_device_t **hw_device)
     rc = openCamera();
     if (rc == 0) {
         *hw_device = &mCameraDevice.common;
-        if (m_thermalAdapter.init(this) != 0) {
-           LOGW("Init thermal adapter failed");
-        }
     } else {
         *hw_device = NULL;
     }
@@ -1136,8 +1114,6 @@ int QCamera3HardwareInterface::closeCamera()
         m_pDualCamCmdHeap = NULL;
         memset(m_pDualCamCmdPtr, 0, sizeof(m_pDualCamCmdPtr));
     }
-
-    m_thermalAdapter.deinit();
 
     rc = mCameraHandle->ops->close_camera(mCameraHandle->camera_handle);
     mCameraHandle = NULL;
@@ -2404,7 +2380,7 @@ int QCamera3HardwareInterface::configureStreamsPerfLocked(
     }
 
     char is_type_value[PROPERTY_VALUE_MAX];
-    property_get("persist.vendor.camera.is_type", is_type_value, "0");
+    property_get("persist.vendor.camera.is_type", is_type_value, "4");
     m_bEis3PropertyEnabled = (atoi(is_type_value) == IS_TYPE_EIS_3_0);
 
     //Create metadata channel and initialize it
@@ -3117,6 +3093,11 @@ int QCamera3HardwareInterface::configureStreamsPerfLocked(
                 gCamCapability[mCameraId]->color_arrangement);
         mStreamConfigInfo.num_streams++;
     }
+
+    mStreamConfigInfo.buffer_info.min_buffers = MIN_INFLIGHT_REQUESTS;
+    mStreamConfigInfo.buffer_info.max_buffers =
+            m_bIs4KVideo ? 0 :
+            m_bEis3PropertyEnabled ? MAX_VIDEO_BUFFERS : MAX_INFLIGHT_REQUESTS;
 
     /* Initialize mPendingRequestInfo and mPendingBuffersMap */
     for (pendingRequestIterator i = mPendingRequestsList.begin();
@@ -5171,6 +5152,11 @@ int QCamera3HardwareInterface::processCaptureRequest(
             cam_stream_size_info_t stream_config_info;
             int32_t hal_version = CAM_HAL_V3;
             memset(&stream_config_info, 0, sizeof(cam_stream_size_info_t));
+            stream_config_info.buffer_info.min_buffers =
+                    MIN_INFLIGHT_REQUESTS;
+            stream_config_info.buffer_info.max_buffers =
+                    m_bIs4KVideo ? 0 :
+                    m_bEis3PropertyEnabled ? MAX_VIDEO_BUFFERS : MAX_INFLIGHT_REQUESTS;
             clear_metadata_buffer(mParameters);
             ADD_SET_PARAM_ENTRY_TO_BATCH(mParameters,
                     CAM_INTF_PARM_HAL_VERSION, hal_version);
@@ -5205,7 +5191,7 @@ int QCamera3HardwareInterface::processCaptureRequest(
         /* get eis information for stream configuration */
         cam_is_type_t isTypeVideo, isTypePreview, is_type=IS_TYPE_NONE;
         char is_type_value[PROPERTY_VALUE_MAX];
-        property_get("persist.vendor.camera.is_type", is_type_value, "0");
+        property_get("persist.vendor.camera.is_type", is_type_value, "4");
         isTypeVideo = static_cast<cam_is_type_t>(atoi(is_type_value));
         // Make default value for preview IS_TYPE as IS_TYPE_EIS_2_0
         property_get("persist.vendor.camera.is_type_preview", is_type_value, "4");
@@ -14722,8 +14708,12 @@ void QCamera3HardwareInterface::setDCFeature(
                 (getHalPPType() != CAM_HAL_PP_TYPE_BOKEH) &&
                 (getHalPPType() != CAM_HAL_PP_TYPE_CLEARSIGHT)) {
             LOGH("SAT flag enabled");
-            if ((stream_type == CAM_STREAM_TYPE_VIDEO) ||
-                (stream_type == CAM_STREAM_TYPE_PREVIEW)) {
+            if (stream_type == CAM_STREAM_TYPE_VIDEO /*&&
+                !is4k2kVideoResolution()*/) {
+                feature_mask |= CAM_QTI_FEATURE_SAT;
+                LOGH("SAT feature mask set");
+            } else if ((stream_type == CAM_STREAM_TYPE_PREVIEW)||
+                (stream_type == CAM_STREAM_TYPE_CALLBACK)) {
                 feature_mask |= CAM_QTI_FEATURE_SAT;
                 LOGH("SAT feature mask set");
             }
@@ -14765,7 +14755,8 @@ void QCamera3HardwareInterface::setDCFeature(
         if (rtbEnabledFlag ||
                 (getHalPPType() == CAM_HAL_PP_TYPE_BOKEH)) {
             LOGH("RTB flag enabled");
-            if (stream_type == CAM_STREAM_TYPE_PREVIEW) {
+            if ((stream_type == CAM_STREAM_TYPE_PREVIEW)||
+                (stream_type == CAM_STREAM_TYPE_CALLBACK)) {
                 feature_mask |= CAM_QTI_FEATURE_RTB;
                 LOGH("RTB feature mask set");
             }

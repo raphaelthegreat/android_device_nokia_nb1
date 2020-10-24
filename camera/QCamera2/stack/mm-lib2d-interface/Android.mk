@@ -17,7 +17,6 @@ LOCAL_C_INCLUDES += \
     $(LOCAL_PATH)/../mm-camera-interface/inc \
 
 LOCAL_HEADER_LIBRARIES := libutils_headers
-LOCAL_HEADER_LIBRARIES += generated_kernel_headers
 ifeq ($(strip $(TARGET_USES_ION)),true)
     LOCAL_CFLAGS += -DUSE_ION
 endif
@@ -30,6 +29,7 @@ LOCAL_MODULE           := libmmlib2d_interface
 include $(SDCLANG_COMMON_DEFS)
 LOCAL_PRELINK_MODULE   := false
 LOCAL_SHARED_LIBRARIES := libdl libcutils liblog libmmcamera_interface
+LOCAL_HEADER_LIBRARIES += generated_kernel_headers
 LOCAL_MODULE_TAGS := optional
 LOCAL_VENDOR_MODULE := true
 

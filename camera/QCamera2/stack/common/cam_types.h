@@ -139,12 +139,8 @@
 #define GPS_PROCESSING_METHOD_SIZE 33
 #define EXIF_IMAGE_DESCRIPTION_SIZE 100
 
-#define MAX_INFLIGHT_REQUESTS  5
-#ifdef HAS_LOW_RAM
-#define MAX_INFLIGHT_BLOB      4
-#else
-#define MAX_INFLIGHT_BLOB      5
-#endif
+#define MAX_INFLIGHT_REQUESTS  6
+#define MAX_INFLIGHT_BLOB      6
 #define MIN_INFLIGHT_REQUESTS  3
 #define MIN_INFLIGHT_60FPS_REQUESTS (6)
 #define MAX_INFLIGHT_REPROCESS_REQUESTS 1
@@ -1673,6 +1669,7 @@ typedef struct {
     int32_t est_snap_iso_value;
     uint32_t est_snap_luma;
     uint32_t est_snap_target;
+    volatile char fih_reserved[60];
 } cam_3a_params_t;
 
 typedef struct {
@@ -2377,6 +2374,8 @@ typedef enum {
     /* parameters added for related cameras */
     /* fetch calibration info for related cam subsystem */
     CAM_INTF_PARM_RELATED_SENSORS_CALIBRATION,
+    /* FIH reserved */
+    FIH_RESERVED,
     /* focal length ratio info */
     CAM_INTF_META_AF_FOCAL_LENGTH_RATIO,
     /* crop for binning & FOV adjust */

@@ -48,7 +48,6 @@
 #include "QCamera3VendorTags.h"
 #include "QCameraDualCamSettings.h"
 #include "QCameraFOVControl.h"
-#include "QCameraThermalAdapter.h"
 
 
 extern "C" {
@@ -169,7 +168,7 @@ private:
     Mutex mRegistryLock;
 };
 
-class QCamera3HardwareInterface : public QCameraThermalCallback {
+class QCamera3HardwareInterface {
 public:
     /* static variable and functions accessed by camera service */
     static camera3_device_ops_t mCameraOps;
@@ -297,9 +296,6 @@ public:
             camera3_buffer_status_t err, void *userdata);
     void setBufferErrorStatus(QCamera3Channel*, uint32_t frameNumber,
             camera3_buffer_status_t err);
-    // Implementation of QCameraThermalCallback
-    virtual int thermalEvtHandle(qcamera_thermal_level_enum_t *level,
-            void *userdata, void *data);
 
     // Get dual camera related info
     bool isDeviceLinked() {return mIsDeviceLinked;}
@@ -495,7 +491,7 @@ private:
     QCamera3RegularChannel *mDummyBatchChannel;
     QCamera3DepthChannel *mDepthChannel;
     QCameraPerfLockMgr mPerfLockMgr;
-    QCameraThermalAdapter &m_thermalAdapter;
+    QCameraFOVControl *m_pFovControl;
     uint32_t mChannelHandle;
 
     void saveExifParams(metadata_buffer_t *metadata);
@@ -633,7 +629,6 @@ public:
     cam_format_t mRdiModeFmt;
     QCamera3QCfaRawChannel *mQCFARawChannel;
     bool m_bQuadraCfaRequest;
-    QCameraFOVControl *m_pFovControl;
 private:
     uint32_t mFirstFrameNumberInBatch;
     camera3_stream_t mDummyBatchStream;
