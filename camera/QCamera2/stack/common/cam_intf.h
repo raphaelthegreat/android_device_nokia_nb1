@@ -637,6 +637,8 @@ typedef struct cam_capability{
     /* Dual cam calibration data */
     cam_related_system_calibration_data_t related_cam_calibration;
 
+    uint8_t fih_reserved[2048]; // Found out using ghidra and cutter and some luck
+
     /* Maximum degree of rotation along X axis for tele sensor with respect to the wide sensor*/
     float      max_roll_degrees;
     /* Maximum degree of rotation along Y axis for tele sensor with respect to the wide sensor*/

@@ -2604,7 +2604,6 @@ void sort_camera_info(int num_cam)
    }
 
     /*NOTE: Add logic here to modify cameraID again here*/
-
     if (idx != 0) {
         memcpy(g_cam_ctrl.info, temp_info, sizeof(temp_info));
         memcpy(g_cam_ctrl.cam_type, temp_type, sizeof(temp_type));
