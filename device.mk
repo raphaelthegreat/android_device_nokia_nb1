@@ -22,22 +22,13 @@ $(call inherit-product, device/nokia/msm8998-common/msm8998.mk)
 
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
-    $(LOCAL_PATH)/overlay
+    $(LOCAL_PATH)/overlay \
+    $(LOCAL_PATH)/overlay-lineage
 
 # Ramdisk
 PRODUCT_PACKAGES += \
-    init.fih.elabel.rc \
-    init.fih.fqcaudio.rc \
-    init.nb1.dbg.rc \
     init.nb1.fingerprint.rc \
-    init.nb1.led.rc \
-    init.nb1.smartamp.rc \
-    init.nb1.target.rc \
-    init.nb1.wbg.rc
-
-PRODUCT_PACKAGES += \
-    init.nb1.lcm.sh \
-    init.nb1.smartamp_init.sh
+    init.nb1.target.rc
 
 # Fingerprint VNDK
 PRODUCT_PACKAGES += \
@@ -51,10 +42,6 @@ PRODUCT_PACKAGES += \
     libmm-qcamera \
     mm-qcamera-app \
     libhal_dbg
-
-# qcmetadataprinter
-PRODUCT_PACKAGES += \
-    get_offsets
 
 # Get non-open-source specific aspects
 $(call inherit-product, vendor/nokia/NB1/NB1-vendor.mk)

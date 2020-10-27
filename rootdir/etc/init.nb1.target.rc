@@ -1,17 +1,34 @@
-import /vendor/etc/init/hw/init.nb1.smartamp.rc
-import /vendor/etc/init/hw/init.fih.fqcaudio.rc
-import /vendor/etc/init/hw/init.nb1.wbg.rc
-import /vendor/etc/init/hw/init.nb1.led.rc
-import /vendor/etc/init/hw/init.nb1.vibrator.rc
 import /vendor/etc/init/hw/init.nb1.fingerprint.rc
-import /vendor/etc/init/hw/init.fih.elabel.rc
-import /vendor/etc/init/hw/init.nb1.dbg.rc
 
 on init
-    setprop persist.vendor.fih.dbg.dev.info 2
+    setprop ro.led.status 0
 
 on early-boot
     rm /persist/bluetooth/.bt_nv.bin
+
+service fqcaudioloopback /vendor/bin/fqcaudioloopback_run.sh
+	user system
+	oneshot
+    disabled
+
+on property:vendor.sys.fqcaudio=11
+    restart fqcaudioloopback
+on property:vendor.sys.fqcaudio=10
+    restart fqcaudioloopback
+on property:vendor.sys.fqcaudio=21
+    restart fqcaudioloopback
+on property:vendor.sys.fqcaudio=20
+    restart fqcaudioloopback
+on property:vendor.sys.fqcaudio=31
+    restart fqcaudioloopback
+on property:vendor.sys.fqcaudio=30
+    restart fqcaudioloopback
+on property:vendor.sys.fqcaudio=51
+    restart fqcaudioloopback
+on property:vendor.sys.fqcaudio=50
+    restart fqcaudioloopback
+on property:vendor.sys.fqcaudio=0
+    stop fqcaudioloopback
 
 service wifisar /system/vendor/bin/sh /system/vendor/bin/wifisar.sh
     user root

@@ -27,7 +27,6 @@ vendor/firmware/TP_Firmware_LG4946
 # Camera HAL
 vendor/lib/libdepthmapwrapper.so
 vendor/lib/libflash_pmic.so
-vendor/lib/libhal_dbg.so
 vendor/lib/libjpegdhw.so
 vendor/lib/libjpegdmahw.so
 vendor/lib/libjpegehw.so
@@ -39,7 +38,6 @@ vendor/lib/libqomx_jpegdec.so
 vendor/lib/libqomx_jpegenc.so
 vendor/lib/libqomx_jpegenc_pipe.so
 vendor/lib/libremosaic_daemon.so
-vendor/lib/libhal_dbg.so
 vendor/lib/libvideoutils.so
 vendor/lib64/libvideoutils.so
 
