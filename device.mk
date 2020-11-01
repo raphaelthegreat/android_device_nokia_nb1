@@ -15,7 +15,7 @@
 
 
 # Set Shipping API level
-$(call inherit-product, $(SRC_TARGET_DIR)/product/product_launched_with_o.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/product_launched_with_n_mr1.mk)
 
 # Inherit from nokia msm8998-common
 $(call inherit-product, device/nokia/msm8998-common/msm8998.mk)

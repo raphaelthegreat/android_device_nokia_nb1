@@ -600,6 +600,12 @@ vendor/lib/hw/nfc_nci.nqx.default.so
 vendor/lib64/nfc_nci.nqx.default.hw.so
 vendor/lib64/hw/nfc_nci.nqx.default.so
 
+# Sensors
+vendor/lib/sensors.ssc.so
+vendor/lib/sensor_calibrate.so
+vendor/lib64/sensors.ssc.so
+vendor/lib64/sensor_calibrate.so
+
 # Widevine (Firmware)
 etc/firmware/widevine.b00:vendor/firmware/widevine.b00
 etc/firmware/widevine.b01:vendor/firmware/widevine.b01

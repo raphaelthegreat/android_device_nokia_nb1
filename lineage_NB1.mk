@@ -28,9 +28,6 @@ $(call inherit-product, device/nokia/NB1/device.mk)
 PRODUCT_AAPT_CONFIG := normal
 PRODUCT_AAPT_PREF_CONFIG := xxhdpi
 
-# Asserts
-TARGET_OTA_ASSERT_DEVICE := NB1
-
 # Boot Animation
 TARGET_SCREEN_HEIGHT := 2560
 TARGET_SCREEN_WIDTH := 1440
