@@ -28,71 +28,39 @@
 
          Must be overridden in platform specific overlays -->
      <integer-array name="config_autoBrightnessLevels">
-          <item>1</item>
-          <item>2</item>
-          <item>3</item>
-          <item>4</item>
-          <item>5</item>
-          <item>6</item>
-          <item>8</item>
-          <item>13</item>
-          <item>17</item>
-          <item>21</item>
-          <item>26</item>
-          <item>30</item>
-          <item>34</item>
-          <item>140</item>
-          <item>310</item>
-          <item>400</item>
-          <item>500</item>
-          <item>600</item>
-          <item>1000</item>
-          <item>1200</item>
-          <item>1500</item>
-          <item>3000</item>
-          <item>3500</item>
-          <item>4000</item>
-     </integer-array>
+        <item>20</item>
+        <item>40</item>
+        <item>100</item>
+        <item>200</item>
+        <item>300</item>
+        <item>400</item>
+        <item>500</item>
+        <item>600</item>
+        <item>700</item>
+        <item>800</item>
+        <item>900</item>
+        <item>1100</item>
+        <item>10000</item>
+    </integer-array>
 
      <!-- Array of output values for LCD backlight corresponding to the LUX values
          in the config_autoBrightnessLevels array.  This array should have size one greater
          than the size of the config_autoBrightnessLevels array.
          This must be overridden in platform specific overlays -->
      <integer-array name="config_autoBrightnessLcdBacklightValues">
-          <item>2</item>
-          <item>2</item>
-          <item>2</item>
-          <item>3</item>
-          <item>3</item>
-          <item>5</item>
-          <item>5</item>
-          <item>12</item>
-          <item>12</item>
-          <item>20</item>
-          <item>20</item>
-          <item>39</item>
-          <item>39</item>
-          <item>43</item>
-          <item>43</item>
-          <item>55</item>
-          <item>55</item>
-          <item>63</item>
-          <item>63</item>
-          <item>84</item>
-          <item>93</item>
-          <item>105</item>
-          <item>200</item>
-          <item>240</item>
-          <item>255</item>
-     </integer-array>
-
-     <!-- Indicate whether to allow the device to suspend when the screen is off
-         due to the proximity sensor.  This resource should only be set to true
-         if the sensor HAL correctly handles the proximity sensor as a wake-up source.
-         Otherwise, the device may fail to wake out of suspend reliably.
-         The default is false. -->
-     <bool name="config_suspendWhenScreenOffDueToProximity">true</bool>
-
-     <!-- Enable system navigation keys. -->
-     <bool name="config_supportSystemNavigationKeys">true</bool>
+        <item>7</item>
+        <item>26</item>
+        <item>34</item>
+        <item>41</item>
+        <item>49</item>
+        <item>54</item>
+        <item>58</item>
+        <item>62</item>
+        <item>65</item>
+        <item>80</item>
+        <item>100</item>
+        <item>140</item>
+        <item>200</item>
+        <item>255</item>
+    </integer-array>
 </resources>

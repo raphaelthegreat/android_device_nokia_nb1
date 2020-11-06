@@ -608,10 +608,11 @@ vendor/etc/libnfc-qrd-NQ4XX.conf
 vendor/etc/libnfc-qrd_rf1.conf
 vendor/etc/libnfc-qrd_rf2.conf
 vendor/bin/hw/vendor.nxp.hardware.nfc@1.1-service
-vendor/etc/permissions/com.android.nfc_extras.xml
-vendor/etc/permissions/com.nxp.mifare.xml
+vendor/etc/init/vendor.nxp.hardware.nfc@1.1-service.rc
+lib/vendor.nxp.hardware.nfc@1.0.so:vendor/lib/vendor.nxp.hardware.nfc@1.0.so
 vendor/lib/nfc_nci.nqx.default.hw.so
 vendor/lib/hw/nfc_nci.nqx.default.so
+lib64/vendor.nxp.hardware.nfc@1.0.so:vendor/lib64/vendor.nxp.hardware.nfc@1.0.so
 vendor/lib64/nfc_nci.nqx.default.hw.so
 vendor/lib64/hw/nfc_nci.nqx.default.so
 
