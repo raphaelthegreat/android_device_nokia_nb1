@@ -15,10 +15,10 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/lineage_NB1.mk
+    $(LOCAL_DIR)/havoc_NB1.mk
 
 COMMON_LUNCH_CHOICES := \
-    lineage_NB1-eng \
-    lineage_NB1-user \
-    lineage_NB1-userdebug
+    havoc_NB1-eng \
+    havoc_NB1-user \
+    havoc_NB1-userdebug
 
