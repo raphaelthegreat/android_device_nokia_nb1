@@ -37,10 +37,6 @@ TARGET_SCREEN_DENSITY := 560
 TARGET_KERNEL_CONFIG := nb1_defconfig
 TARGET_KERNEL_VERSION := 4.4
 
-# SELinux
-BOARD_SEPOLICY_DIRS += $(LOCAL_PATH)/sepolicy/vendor
-BOARD_PLAT_PRIVATE_SEPOLICY_DIR += $(LOCAL_PATH)/sepolicy/private
-
 # Shims
 TARGET_LD_SHIM_LIBS := \
    /vendor/bin/gx_fpd|libshims_gxfpd.so
