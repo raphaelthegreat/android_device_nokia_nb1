@@ -25,23 +25,29 @@ DEVICE_PACKAGE_OVERLAYS += \
     $(LOCAL_PATH)/overlay \
     $(LOCAL_PATH)/overlay-lineage
 
-# Ramdisk
-PRODUCT_PACKAGES += \
-    init.nb1.fingerprint.rc \
-    init.nb1.target.rc
-
-# Fingerprint VNDK
-PRODUCT_PACKAGES += \
-    libshims_gxfpd \
-    libunwind-vendor \
-    libbacktrace-vendor
-
 # Camera
 PRODUCT_PACKAGES += \
     camera.msm8998 \
     libmm-qcamera \
     mm-qcamera-app \
     libhal_dbg
+
+# Fingerprint
+PRODUCT_PACKAGES += \
+    android.hardware.biometrics.fingerprint@2.1-service.nokia_nb1 \
+    libshims_gxfpd \
+    libunwind-vendor \
+    libbacktrace-vendor
+
+# Keylayout
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/keylayout/goodix_fp.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/goodix_fp.kl \
+    $(LOCAL_PATH)/keylayout/gpio-keys.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/gpio-keys.kl
+
+# Ramdisk
+PRODUCT_PACKAGES += \
+    init.nb1.fingerprint.rc \
+    init.nb1.target.rc
 
 # Get non-open-source specific aspects
 $(call inherit-product, vendor/nokia/NB1/NB1-vendor.mk)

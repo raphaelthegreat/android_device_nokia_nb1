@@ -1,0 +1,41 @@
+type hal_fingerprint_nb1, domain, binder_in_vendor_violators;
+hal_server_domain(hal_fingerprint_nb1, hal_fingerprint)
+
+type hal_fingerprint_nb1_exec, exec_type, vendor_file_type, file_type;
+
+init_daemon_domain(hal_fingerprint_nb1)
+
+binder_call(hal_fingerprint_nb1, vndservicemanager)
+binder_call(hal_fingerprint_nb1, gx_fpd)
+binder_use(hal_fingerprint_nb1)
+
+add_service(hal_fingerprint_nb1, hal_fingerprint_nb1_service);
+
+allow hal_fingerprint_nb1 vnd_hal_fingerprint_nb1_service:service_manager { find };
+allow hal_fingerprint_nb1 vnd_gx_fpd_service:service_manager { find };
+allow hal_fingerprint_nb1 fingerprint_service:service_manager { find };
+
+allow hal_fingerprint_nb1 tee_device:chr_file { rw_file_perms };
+allow hal_fingerprint_nb1 uhid_device:chr_file { rw_file_perms };
+
+# /data/system/users/0/fpdata
+typeattribute hal_fingerprint_nb1 data_between_core_and_vendor_violators;
+allow hal_fingerprint_nb1 fingerprintd_data_file:dir { rw_dir_perms };
+allow hal_fingerprint_nb1 fingerprintd_data_file:file { create_file_perms };
+
+set_prop(hal_fingerprint_nb1, system_prop)
+r_dir_file(hal_fingerprint_nb1, firmware_file)
+
+# Need to add auth tokens to KeyStore
+use_keystore(hal_fingerprint_nb1)
+allow hal_fingerprint_nb1 keystore:keystore_key { add_auth };
+allow hal_fingerprint_nb1 keystore_service:service_manager { find };
+
+# For permissions checking
+binder_call(hal_fingerprint_nb1, system_server);
+allow hal_fingerprint_nb1 permission_service:service_manager { find };
+
+# RW persmissions for /dev/vndbinder
+allow hal_fingerprint_nb1 vndbinder_device:chr_file { rw_file_perms };
+
+allow hal_fingerprint_nb1 gx_fpd:binder { call transfer };

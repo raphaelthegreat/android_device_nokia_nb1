@@ -1,6 +1,7 @@
 on boot
     chown system system /dev/goodix_fp
     chmod 0644 /dev/goodix_fp
+    chmod 0666 /dev/qseecom
 
 on init
     setprop persist.fp.navigation 1
@@ -10,9 +11,10 @@ on post-fs-data
     mkdir /data/system/fingerprint 0770 system system
 
 service gx_fpd /vendor/bin/gx_fpd
-    class main
+    class late_start
     user system
     group system
+    writepid /dev/cpuset/system-background/tasks
 
 on property:sys.fih.fingerprint=false
     stop gx_fpd
