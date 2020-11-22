@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "biometrics.fingerprint@2.1-service.nokia_nb1"
+#define LOG_TAG "biometrics.fingerprint@2.0-service.nokia_nb1"
 
 #include <binder/ProcessState.h>
 
@@ -61,7 +61,7 @@ int main() {
         }
 
         // the conventional HAL might start vndbinder services
-        android::ProcessState::initWithDriver("/dev/binder");
+        android::ProcessState::initWithDriver("/dev/vndbinder");
         // start a threadpool for vndbinder interactions
         android::ProcessState::self()->startThreadPool();
     }

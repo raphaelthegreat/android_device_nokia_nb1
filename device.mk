@@ -34,7 +34,7 @@ PRODUCT_PACKAGES += \
 
 # Fingerprint
 PRODUCT_PACKAGES += \
-    android.hardware.biometrics.fingerprint@2.1-service.nokia_nb1 \
+    android.hardware.biometrics.fingerprint@2.0-service.nokia_nb1 \
     libshims_gxfpd \
     libunwind-vendor \
     libbacktrace-vendor

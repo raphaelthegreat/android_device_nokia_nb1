@@ -1,7 +1,7 @@
 cc_binary {
-    name: "android.hardware.biometrics.fingerprint@2.1-service.nokia_nb1",
+    name: "android.hardware.biometrics.fingerprint@2.0-service.nokia_nb1",
     defaults: ["hidl_defaults"],
-    init_rc: ["android.hardware.biometrics.fingerprint@2.1-service.nokia_nb1.rc"],
+    init_rc: ["android.hardware.biometrics.fingerprint@2.0-service.nokia_nb1.rc"],
     vendor: true,
     relative_install_path: "hw",
     srcs: [
