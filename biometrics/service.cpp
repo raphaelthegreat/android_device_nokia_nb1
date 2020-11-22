@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "biometrics.fingerprint@2.0-service.nokia_nb1"
-
-#include <binder/ProcessState.h>
+#define LOG_TAG "android.hardware.biometrics.fingerprint@2.1-service.nokia_nb1"
 
 #include <android/log.h>
 #include <hidl/HidlSupport.h>
 #include <hidl/HidlTransportSupport.h>
 #include <android/hardware/biometrics/fingerprint/2.1/IBiometricsFingerprint.h>
 #include <android/hardware/biometrics/fingerprint/2.1/types.h>
-
 #include "BiometricsFingerprint.h"
-#include <cutils/properties.h>
-#include <errno.h>
-#include <unistd.h>
 
 using android::hardware::biometrics::fingerprint::V2_1::IBiometricsFingerprint;
 using android::hardware::biometrics::fingerprint::V2_1::implementation::BiometricsFingerprint;
@@ -35,39 +29,10 @@ using android::hardware::configureRpcThreadpool;
 using android::hardware::joinRpcThreadpool;
 using android::sp;
 
-bool is_goodix = false;
-
-static constexpr char kGoodixFpDev[] = "/dev/goodix_fp";
-
 int main() {
-    char vend[PROPERTY_VALUE_MAX];
-    property_get("ro.hardware.fingerprint", vend, "none");
-
-    if (!strcmp(vend, "none")) {
-        ALOGE("ro.hardware.fingerprint not set! Killing " LOG_TAG " binder service!");
-        return 1;
-    } else if (!strcmp(vend, "goodix")) {
-        ALOGI("is_goodix = true");
-        is_goodix = true;
-    }
-
-    ALOGI("Start biometrics");
     android::sp<IBiometricsFingerprint> bio = BiometricsFingerprint::getInstance();
 
-    if (is_goodix) {
-        if (access(kGoodixFpDev, F_OK) != 0) {
-            ALOGE("Cannot access %s (%s)", kGoodixFpDev, strerror(errno));
-            return 1;
-        }
-
-        // the conventional HAL might start vndbinder services
-        android::ProcessState::initWithDriver("/dev/vndbinder");
-        // start a threadpool for vndbinder interactions
-        android::ProcessState::self()->startThreadPool();
-    }
-
-    /* process Binder transaction as a single-threaded program. */
-    configureRpcThreadpool(1, true /* callerWillJoin */);
+    configureRpcThreadpool(1, true /*callerWillJoin*/);
 
     if (bio != nullptr) {
         if (::android::OK != bio->registerAsService()) {
