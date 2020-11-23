@@ -16,6 +16,6 @@ Announced on 16 August 2017 in London, England by HMD Global,[4][5] the phone be
 | Camera (Back)           | 13 MP, f/2.0, 1/3.1", 1.12µm, PDAF, Laser AF, OIS                                                                              |
 | Camera (Front)          | 13 MP, f/2.0, (wide), 1/3.1", 1.12µm, PDAF                                                                                                    |
 
-![Nokia 6.1 Plus](https://fdn2.gsmarena.com/vv/pics/nokia/nokia-8-5.jpg)
+![Nokia 8](https://static.wikia.nocookie.net/hmd_nokia/images/f/f1/Nb1.png/revision/latest?cb=20200529024823)
 
 **Copyright 2020 - The LineageOS Project**
