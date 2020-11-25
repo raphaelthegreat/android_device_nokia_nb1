@@ -26,7 +26,7 @@ DEVICE_PACKAGE_OVERLAYS += \
     $(LOCAL_PATH)/overlay-lineage
 
 # Camera
-#PRODUCT_PACKAGES += \
+PRODUCT_PACKAGES += \
     camera.msm8998 \
     libmm-qcamera \
     mm-qcamera-app \
