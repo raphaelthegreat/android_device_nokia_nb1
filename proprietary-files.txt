@@ -584,13 +584,6 @@ vendor/firmware/leia_pfp_470.fw
 vendor/firmware/leia_pm4_470.fw
 vendor/firmware/libpn548ad_fw.so
 
-# NFC (NXP)
-vendor/lib/libpn547_fw.so
-vendor/lib/libpn548ad_fw.so
-vendor/lib/libpn551_fw.so
-vendor/lib/libpn553_fw.so
-vendor/lib/libpn557_fw.so
-
 # NFC (Samsung)
 vendor/etc/libnfc-brcm.conf
 vendor/etc/libnfc-mtp_default.conf
@@ -607,14 +600,6 @@ vendor/etc/libnfc-qrd-NQ3XX.conf
 vendor/etc/libnfc-qrd-NQ4XX.conf
 vendor/etc/libnfc-qrd_rf1.conf
 vendor/etc/libnfc-qrd_rf2.conf
-vendor/bin/hw/vendor.nxp.hardware.nfc@1.1-service
-vendor/etc/init/vendor.nxp.hardware.nfc@1.1-service.rc
-lib/vendor.nxp.hardware.nfc@1.0.so:vendor/lib/vendor.nxp.hardware.nfc@1.0.so
-vendor/lib/nfc_nci.nqx.default.hw.so
-vendor/lib/hw/nfc_nci.nqx.default.so
-lib64/vendor.nxp.hardware.nfc@1.0.so:vendor/lib64/vendor.nxp.hardware.nfc@1.0.so
-vendor/lib64/nfc_nci.nqx.default.hw.so
-vendor/lib64/hw/nfc_nci.nqx.default.so
 
 # Sensors
 vendor/lib/sensors.ssc.so
