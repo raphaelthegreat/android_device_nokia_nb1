@@ -591,16 +591,6 @@ vendor/lib/libpn551_fw.so
 vendor/lib/libpn553_fw.so	
 vendor/lib/libpn557_fw.so
 
-# NFC
-vendor/bin/hw/vendor.nxp.hardware.nfc@1.1-service	
-vendor/etc/init/vendor.nxp.hardware.nfc@1.1-service.rc	
-lib/vendor.nxp.hardware.nfc@1.0.so:vendor/lib/vendor.nxp.hardware.nfc@1.0.so	
-vendor/lib/nfc_nci.nqx.default.hw.so	
-vendor/lib/hw/nfc_nci.nqx.default.so	
-lib64/vendor.nxp.hardware.nfc@1.0.so:vendor/lib64/vendor.nxp.hardware.nfc@1.0.so	
-vendor/lib64/nfc_nci.nqx.default.hw.so	
-vendor/lib64/hw/nfc_nci.nqx.default.so
-
 # NFC (Configs)
 vendor/etc/libnfc-brcm.conf
 vendor/etc/libnfc-mtp_default.conf
