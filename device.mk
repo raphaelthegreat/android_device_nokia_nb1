@@ -39,6 +39,9 @@ PRODUCT_PACKAGES += \
     libunwind-vendor \
     libbacktrace-vendor
 
+PRODUCT_SOONG_NAMESPACES += \
+    vendor/nxp/opensource/pn5xx
+
 # NFC
 PRODUCT_PACKAGES += \
     NQNfcNci \
