@@ -39,26 +39,6 @@ PRODUCT_PACKAGES += \
     libunwind-vendor \
     libbacktrace-vendor
 
-PRODUCT_SOONG_NAMESPACES += \
-    vendor/nxp/opensource/pn5xx
-
-# NFC
-PRODUCT_PACKAGES += \
-    NQNfcNci \
-    SecureElement \
-    libnqnfc-nci \
-    libnqnfc_nci_jni \
-    nfc_nci.nqx.default \
-    libp61-jcop-kit \
-    com.nxp.nfc.nq \
-    com.nxp.nfc.nq.xml \
-    nqnfcee_access.xml \
-    nqnfcse_access.xml \
-    Tag \
-    com.android.nfc_extras \
-    vendor.nxp.hardware.nfc@1.2-service \
-    nfc_nci.nqx.default.hw
-
 # Keylayout
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayout/goodix_fp.kl:$(TARGET_COPY_OUT_VENDOR)/usr/keylayout/goodix_fp.kl \
