@@ -18,8 +18,8 @@
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 
-# Inherit some common Lineage stuff
-$(call inherit-product, vendor/lineage/config/common_full_phone.mk)
+# Inherit some common RevengeOS stuff
+$(call inherit-product, vendor/revengeos/config/common.mk)
 
 # Inherit from NB1 device
 $(call inherit-product, device/nokia/NB1/device.mk)
@@ -28,11 +28,12 @@ $(call inherit-product, device/nokia/NB1/device.mk)
 PRODUCT_AAPT_CONFIG := normal
 PRODUCT_AAPT_PREF_CONFIG := xxhdpi
 
-# Boot Animation
-TARGET_SCREEN_HEIGHT := 2560
-TARGET_SCREEN_WIDTH := 1440
+# Inherit some common AOSP stuff
+IS_PHONE := true
+TARGET_DENSITY := xxxhdpi
+TARGET_BOOT_ANIMATION_RES := 1440
 
-PRODUCT_NAME := lineage_NB1
+PRODUCT_NAME := revengeos_NB1
 PRODUCT_DEVICE := NB1
 PRODUCT_MANUFACTURER := HMD Global
 PRODUCT_BRAND := Nokia

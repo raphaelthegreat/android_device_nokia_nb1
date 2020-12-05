@@ -15,10 +15,9 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/lineage_NB1.mk
+    $(LOCAL_DIR)/revengeos_NB1.mk
 
 COMMON_LUNCH_CHOICES := \
-    lineage_NB1-eng \
-    lineage_NB1-user \
-    lineage_NB1-userdebug
-
+    revengeos_NB1-eng \
+    revengeos_NB1-user \
+    revengeos_NB1-userdebug
