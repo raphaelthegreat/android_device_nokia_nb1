@@ -1,8 +1,5 @@
 /*
-   Copyright (C) 2007, The Android Open Source Project
-   Copyright (c) 2016, The CyanogenMod Project
-   Copyright (c) 2017, The LineageOS Project
-
+   Copyright (c) 2014, The Linux Foundation. All rights reserved.
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
    met:
@@ -15,7 +12,6 @@
     * Neither the name of The Linux Foundation nor the names of its
       contributors may be used to endorse or promote products derived
       from this software without specific prior written permission.
-
    THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
    WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
@@ -29,29 +25,13 @@
    IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <fcntl.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#include <android-base/file.h>
-#include <android-base/logging.h>
-#include <android-base/properties.h>
-#include <android-base/strings.h>
-
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 #include <sys/_system_properties.h>
-
-#include "vendor_init.h"
+#include <sys/sysinfo.h>
+#include <android-base/properties.h>
 #include "property_service.h"
-
-#define DEVINFO_FILE "/sys/project_info/project_name"
-#define SENSOR_VERSION_FILE "/sys/devices/soc/soc:fingerprint_detect/sensor_version"
-
-using android::base::Trim;
-using android::base::ReadFileToString;
+#include "vendor_init.h"
 
 void property_override(char const prop[], char const value[], bool add = true)
 {
@@ -64,11 +44,17 @@ void property_override(char const prop[], char const value[], bool add = true)
     }
 }
 
+void property_override_triple(char const product_prop[], char const system_prop[], char const vendor_prop[], char const value[])
+{
+    property_override(product_prop, value);
+    property_override(system_prop, value);
+    property_override(vendor_prop, value);
+}
+
 void vendor_load_properties() 
 {
-    LOG(INFO) << "Loading vendor specific properties";
-    
-    property_override("ro.build.fingerprint", "Nokia/Avenger_00WW/A1N_sprout:10/QKQ1.190828.002/00WW_5_140:user/release-keys");
-    property_override("ro.system.build.fingerprint", "Nokia/Avenger_00WW/A1N_sprout:10/QKQ1.190828.002/00WW_5_140:user/release-keys");
-    property_override("ro.vendor.build.fingerprint", "Nokia/Avenger_00WW/A1N_sprout:10/QKQ1.190828.002/00WW_5_140:user/release-keys");
+    // Fingerprint
+    property_override("ro.build.description", "coral-user 11 RQ1A.201205.008 6943376 release-keys");
+    property_override_triple("ro.build.fingerprint", "ro.system.build.fingerprint", "ro.vendor.build.fingerprint",
+    "google/coral/coral:11/RQ1A.201205.008/6943376:user/release-keys:user/release-keys");
 }
