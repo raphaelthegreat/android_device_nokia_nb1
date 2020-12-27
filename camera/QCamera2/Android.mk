@@ -103,8 +103,8 @@ LOCAL_C_INCLUDES := \
         $(LOCAL_PATH)/stack/mm-camera-interface/inc \
         $(LOCAL_PATH)/util \
         $(LOCAL_PATH)/HAL3 \
-        $(call project-path-for,qcom-media)/libstagefrighthw \
-        $(call project-path-for,qcom-media)/mm-core/inc \
+        hardware/qcom/media/libstagefrighthw \
+        hardware/qcom/media/mm-core/inc \
         $(TARGET_OUT_HEADERS)/mm-camera-lib/cp/prebuilt
 
 LOCAL_HEADER_LIBRARIES := camera_common_headers
@@ -141,10 +141,10 @@ LOCAL_CFLAGS += -DUSE_CAMERA_METABUFFER_UTILS
 LOCAL_C_INCLUDES += \
         $(TARGET_OUT_HEADERS)/qcom/display
 LOCAL_C_INCLUDES += \
-        $(call project-path-for,qcom-display)/libqservice \
-        $(call project-path-for,qcom-display)/libqdutils \
-        $(call project-path-for,qcom-display)/include \
-        $(call project-path-for,qcom-display)/gralloc
+        hardware/qcom/display/libqservice \
+        hardware/qcom/display/libqdutils \
+        hardware/qcom/display/include \
+        hardware/qcom/display/gralloc
 	
 LOCAL_SHARED_LIBRARIES := liblog libhardware libutils libcutils libdl libsync
 LOCAL_SHARED_LIBRARIES += libmmcamera_interface libmmjpeg_interface libui libcamera_metadata

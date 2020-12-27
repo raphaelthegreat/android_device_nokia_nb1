@@ -22,8 +22,7 @@ $(call inherit-product, device/nokia/msm8998-common/msm8998.mk)
 
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
-    $(LOCAL_PATH)/overlay \
-    $(LOCAL_PATH)/overlay-lineage
+    $(LOCAL_PATH)/overlay
 
 # Audio
 PRODUCT_COPY_FILES += \
