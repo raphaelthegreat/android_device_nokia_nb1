@@ -40,11 +40,6 @@ TARGET_KERNEL_VERSION := 4.4
 # Sepolicy
 BOARD_VENDOR_SEPOLICY_DIRS += $(LOCAL_PATH)/sepolicy/vendor
 
-# Shims
-TARGET_LD_SHIM_LIBS := \
-   /vendor/lib64/libfpservice.so|libshim_binder.so \
-   /vendor/lib/hw/camera.msm8998.so|libshim_gui.so
-
 # Partitions
 BOARD_BOOTIMAGE_PARTITION_SIZE := 67108864
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 3221225472

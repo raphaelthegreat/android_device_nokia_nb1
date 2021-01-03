@@ -25,6 +25,11 @@ function blob_fixup() {
         # Use vendor version of libgui
         vendor/lib/hw/camera.msm8998.so)
             "${PATCHELF}" --replace-needed "libgui.so" "libgui_vendor.so" "${2}"
+            "${PATCHELF}" --add-needed "libshim_gui.so" "${2}"
+            ;;
+        # Add shim to libfpservice
+        vendor/lib64/libfpservice.so)
+            "${PATCHELF}" --add-needed "libshim_binder.so" "${2}"
             ;;
     esac
 }
