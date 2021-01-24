@@ -39,7 +39,7 @@ TARGET_RECOVERY_DEVICE_MODULES := libinit_nb1
 
 # Kernel
 TARGET_KERNEL_CONFIG := nb1_defconfig
-TARGET_KERNEL_SOURCE := kernel/nokia/umbrella
+TARGET_KERNEL_SOURCE := kernel/nokia/nb1-a11
 TARGET_KERNEL_VERSION := 4.4
 
 # Shims
