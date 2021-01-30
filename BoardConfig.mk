@@ -41,6 +41,8 @@ TARGET_RECOVERY_DEVICE_MODULES := libinit_nb1
 TARGET_KERNEL_CONFIG := nb1_defconfig
 TARGET_KERNEL_SOURCE := kernel/nokia/nb1-a11
 TARGET_KERNEL_VERSION := 4.4
+TARGET_KERNEL_CROSS_COMPILE_PREFIX := $(shell pwd)/kernel/nokia/nb1-a11/toolchain/aarch64-elf-gcc/bin/aarch64-elf-
+TARGET_KERNEL_CROSS_COMPILE_ARM32_PREFIX := $(shell pwd)/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-
 
 # Shims
 TARGET_LD_SHIM_LIBS := \
