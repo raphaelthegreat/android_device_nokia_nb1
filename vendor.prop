@@ -1,7 +1,6 @@
 # Camera
 persist.camera.debug_img_exif=1
 persist.ts.rtmakeup=false
-vendor.camera.aux.packagelist=com.evenwell.camera2,com.evenwell.fqc,com.tools.alt,com.hmdglobal.camera2
 persist.vendor.camera.gyro.android=0
 persist.vendor.camera.tof.direct=1
 persist.vendor.camera.gyro.disable=0
