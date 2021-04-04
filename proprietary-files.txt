@@ -1,16 +1,6 @@
 ## NB1 proprietary files
 ## From Nokia/NB1_00WW_FIH/NB1:9/PPR1.180610.011/00WW_5_15J:user/release-keys unless pinned
 
-# Audio ACDB
-vendor/etc/acdbdata/NB1/Bluetooth_cal.acdb
-vendor/etc/acdbdata/NB1/General_cal.acdb
-vendor/etc/acdbdata/NB1/Global_cal.acdb
-vendor/etc/acdbdata/NB1/Handset_cal.acdb
-vendor/etc/acdbdata/NB1/Hdmi_cal.acdb
-vendor/etc/acdbdata/NB1/Headset_cal.acdb
-vendor/etc/acdbdata/NB1/Speaker_cal.acdb
-vendor/etc/acdbdata/NB1/workspaceFile.qwsp
-
 # Audio amplifer TAS2555
 etc/firmware/tfa98xx.cnt:vendor/firmware/tfa98xx.cnt
 etc/firmware/tfa98xxEVT.cnt:vendor/firmware/tfa98xxEVT.cnt
@@ -269,27 +259,6 @@ vendor/lib/libchromatix_imx258_single_mono_nb1_video_4k.so
 vendor/lib/libchromatix_imx258_single_mono_nb1_zsl_preview_3a.so
 vendor/lib/libchromatix_imx258_single_mono_nb1_zsl_video_3a.so
 
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_4k_preview_3a.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_4k_video_3a.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_common.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_cpp_hfr_60.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_cpp_liveshot.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_cpp_preview.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_cpp_snapshot.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_cpp_video.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_cpp_video_4k.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_default_preview_3a.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_default_video_3a.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_hfr_60.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_hfr_60_3a.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_postproc.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_preview.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_snapshot.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_video.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_video_4k.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_zsl_preview_3a.so
-vendor/lib/libchromatix_s5k2l7sa05_a1n_wide_zsl_video_3a.so
-
 vendor/lib/libchromatix_s5k3l8_front_nb1_4k_preview_3a.so
 vendor/lib/libchromatix_s5k3l8_front_nb1_4k_video_3a.so
 vendor/lib/libchromatix_s5k3l8_front_nb1_common.so
@@ -319,57 +288,6 @@ vendor/lib/libchromatix_s5k3l8_front_nb1_versions.so
 vendor/lib/libchromatix_s5k3l8_front_nb1_video_4k.so
 vendor/lib/libchromatix_s5k3l8_front_nb1_zsl_preview_3a.so
 vendor/lib/libchromatix_s5k3l8_front_nb1_zsl_video_3a.so
-
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_4k_preview_3a.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_4k_video_3a.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_common.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_cpp_hfr_60.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_cpp_liveshot.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_cpp_preview.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_cpp_snapshot.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_cpp_video.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_cpp_video_4k.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_default_preview_3a.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_default_video_3a.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_hfr_60.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_hfr_60_3a.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_liveshot.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_postproc.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_preview.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_snapshot.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_versions.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_video_4k.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_zsl_preview_3a.so
-vendor/lib/libchromatix_s5k3m3sm_a1n_tele_zsl_video_3a.so
-
-vendor/lib/libchromatix_s5k4e8_a1n_front_4k_preview_3a.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_4k_video_3a.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_common.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_cpp_hfr_120.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_cpp_hfr_60.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_cpp_hfr_90.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_cpp_liveshot.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_cpp_preview.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_cpp_snapshot.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_cpp_video.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_cpp_video_4k.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_default_preview_3a.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_default_video.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_default_video_3a.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_hfr_120.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_hfr_120_3a.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_hfr_60.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_hfr_60_3a.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_hfr_90.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_hfr_90_3a.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_liveshot.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_postproc.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_preview.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_snapshot.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_versions.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_video_4k.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_zsl_preview_3a.so
-vendor/lib/libchromatix_s5k4e8_a1n_front_zsl_video_3a.so
 
 # Camera eeprom
 vendor/lib/libmmcamera_eeprom_util.so
@@ -427,8 +345,6 @@ vendor/lib/libmmcamera_imx318.so
 vendor/lib/libmmcamera_imx362.so
 vendor/lib/libmmcamera_imx376.so
 vendor/lib/libmmcamera_imx378.so
-vendor/lib/libmmcamera_ov12a10.so
-vendor/lib/libmmcamera_ov13850.so
 vendor/lib/libmmcamera_s5k2l7.so
 vendor/lib/libmmcamera_s5k2l7sx.so
 vendor/lib/libmmcamera_s5k3l8.so
@@ -439,17 +355,7 @@ vendor/lib/libmmcamera_s5k3m2xx.so
 vendor/lib/libmmcamera_s5k3m3sm.so
 vendor/lib/libmmcamera_s5k3p3sm.so
 vendor/lib/libmmcamera_s5k3p8sp.so
-vendor/lib/libmmcamera_ov8858.so
-vendor/lib/libmmcamera_ov8865.so
-vendor/lib/libmmcamera_ov4188.so
-vendor/lib/libmmcamera_ov5645.so
-vendor/lib/libmmcamera_ov5670.so
-vendor/lib/libmmcamera_ov5695.so
-vendor/lib/libmmcamera_ov8856.so
-vendor/lib/libmmcamera_ov13855.so
-vendor/lib/libmmcamera_ov13880.so
-vendor/lib/libmmcamera_ov2281.so
-vendor/lib/libmmcamera_ov2680.so
+
 
 # Camera ISP
 vendor/lib/libmmcamera2_isp_modules.so
