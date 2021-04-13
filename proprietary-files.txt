@@ -5,6 +5,25 @@
 etc/firmware/tfa98xx.cnt:vendor/firmware/tfa98xx.cnt
 etc/firmware/tfa98xxEVT.cnt:vendor/firmware/tfa98xxEVT.cnt
 
+# Audio ACDB
+vendor/etc/acdbdata/NB1/Bluetooth_cal.acdb
+vendor/etc/acdbdata/NB1/General_cal.acdb
+vendor/etc/acdbdata/NB1/Global_cal.acdb
+vendor/etc/acdbdata/NB1/Handset_cal.acdb
+vendor/etc/acdbdata/NB1/Hdmi_cal.acdb
+vendor/etc/acdbdata/NB1/Headset_cal.acdb
+vendor/etc/acdbdata/NB1/Speaker_cal.acdb
+vendor/etc/acdbdata/NB1/workspaceFile.qwsp
+vendor/etc/acdbdata/NB1EVT/Bluetooth_cal.acdb
+vendor/etc/acdbdata/NB1EVT/General_cal.acdb
+vendor/etc/acdbdata/NB1EVT/Global_cal.acdb
+vendor/etc/acdbdata/NB1EVT/Handset_cal.acdb
+vendor/etc/acdbdata/NB1EVT/Hdmi_cal.acdb
+vendor/etc/acdbdata/NB1EVT/Headset_cal.acdb
+vendor/etc/acdbdata/NB1EVT/Speaker_cal.acdb
+vendor/etc/acdbdata/NB1EVT/workspaceFile.qwsp
+vendor/etc/acdbdata/adsp_avs_config.acdb
+
 # Display (Configs)
 vendor/bin/qca6234-service.sh
 vendor/bin/qdcm_calib_data_JDI_Dual_nt36850_cmd_mode_dsi_panel_without_DSC.xml
