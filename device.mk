@@ -23,7 +23,7 @@ $(call inherit-product, device/nokia/msm8998-common/msm8998.mk)
 # Audio
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/audio/audio_platform_info.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_platform_info.xml \
-    $(LOCAL_PATH)/audio/mixer_paths_tasha.conf:$(TARGET_COPY_OUT_VENDOR)/etc/mixer_paths_tasha.conf \
+    $(LOCAL_PATH)/audio/mixer_paths_tasha.xml:$(TARGET_COPY_OUT_VENDOR)/etc/mixer_paths_tasha.xml \
 
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
