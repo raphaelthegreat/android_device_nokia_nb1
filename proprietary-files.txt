@@ -503,12 +503,6 @@ vendor/etc/libnfc-qrd-NQ4XX.conf
 vendor/etc/libnfc-qrd_rf1.conf
 vendor/etc/libnfc-qrd_rf2.conf
 
-# Sensors
-vendor/lib/sensors.ssc.so
-vendor/lib/sensor_calibrate.so
-vendor/lib64/sensors.ssc.so
-vendor/lib64/sensor_calibrate.so
-
 # Misc
 vendor/bin/csysservice
 vendor/etc/init/csysservice_nontreble.rc
