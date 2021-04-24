@@ -1149,10 +1149,13 @@
         <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia7" value="1" />
     </path>
 
-    <path name="compress-offload-playback2 speaker-safe">
-        <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia7" value="1" />
+    <path name="compress-offload-playback2 speaker">
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
     </path>
 
+    <path name="compress-offload-playback2 speaker-safe">
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
+    </path>
     <path name="compress-offload-playback2 hdmi">
         <ctl name="HDMI Mixer MultiMedia7" value="1" />
     </path>
@@ -1255,8 +1258,12 @@
         <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia10" value="1" />
     </path>
 
+    <path name="compress-offload-playback3 speaker">
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
+    </path>
+
     <path name="compress-offload-playback3 speaker-safe">
-        <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia10" value="1" />
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
     </path>
 
     <path name="compress-offload-playback3 hdmi">
@@ -1361,8 +1368,12 @@
         <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia11" value="1" />
     </path>
 
+    <path name="compress-offload-playback4 speaker">
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
+    </path>
+
     <path name="compress-offload-playback4 speaker-safe">
-        <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia11" value="1" />
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
     </path>
 
     <path name="compress-offload-playback4 hdmi">
@@ -1468,8 +1479,12 @@
         <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia12" value="1" />
     </path>
 
+    <path name="compress-offload-playback5 speaker">
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
+    </path>
+
     <path name="compress-offload-playback5 speaker-safe">
-        <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia12" value="1" />
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
     </path>
 
     <path name="compress-offload-playback5 hdmi">
@@ -1574,8 +1589,12 @@
         <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia13" value="1" />
     </path>
 
+    <path name="compress-offload-playback6 speaker">
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
+    </path>
+
     <path name="compress-offload-playback6 speaker-safe">
-        <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia13" value="1" />
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
     </path>
 
     <path name="compress-offload-playback6 hdmi">
@@ -1680,8 +1699,12 @@
         <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia14" value="1" />
     </path>
 
+    <path name="compress-offload-playback7 speaker">
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
+    </path>
+
     <path name="compress-offload-playback7 speaker-safe">
-        <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia14" value="1" />
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
     </path>
 
     <path name="compress-offload-playback7 hdmi">
@@ -1786,8 +1809,12 @@
         <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia15" value="1" />
     </path>
 
+    <path name="compress-offload-playback8 speaker">
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
+    </path>
+
     <path name="compress-offload-playback8 speaker-safe">
-        <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia15" value="1" />
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
     </path>
 
     <path name="compress-offload-playback8 hdmi">
@@ -1892,8 +1919,12 @@
         <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia16" value="1" />
     </path>
 
+    <path name="compress-offload-playback9 speaker">
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
+    </path>
+
     <path name="compress-offload-playback9 speaker-safe">
-        <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia16" value="1" />
+        <ctl name="QUAT_MI2S_RX Audio Mixer MultiMedia10" value="1" />
     </path>
 
     <path name="compress-offload-playback9 hdmi">
@@ -2843,10 +2874,6 @@
         <ctl name="ADC2 Volume" value="12" />
     </path>
 
-    <path name="unprocessed-headset-mic">
-        <path name="headset-mic" />
-    </path>
-
     <path name="voice-handset">
         <path name="handset" />
     </path>
@@ -3140,11 +3167,13 @@
         <ctl name="AIF1_CAP Mixer SLIM TX7" value="1" />
         <ctl name="AIF1_CAP Mixer SLIM TX8" value="1" />
         <ctl name="SLIM TX7 MUX" value="DEC7" />
+        <ctl name="DEC7 Volume" value="96" />
         <ctl name="ADC MUX7" value="DMIC" />
-        <ctl name="DMIC MUX7" value="DMIC2" />
+        <ctl name="DMIC MUX7" value="DMIC0" />
         <ctl name="SLIM TX8 MUX" value="DEC8" />
+        <ctl name="DEC8 Volume" value="96" />
         <ctl name="ADC MUX8" value="DMIC" />
-        <ctl name="DMIC MUX8" value="DMIC4" />
+        <ctl name="DMIC MUX8" value="DMIC2" />
         <ctl name="SLIM_0_TX Channels" value="Two" />
     </path>
 
@@ -3153,11 +3182,13 @@
         <ctl name="AIF1_CAP Mixer SLIM TX7" value="1" />
         <ctl name="AIF1_CAP Mixer SLIM TX8" value="1" />
         <ctl name="SLIM TX7 MUX" value="DEC7" />
+        <ctl name="DEC7 Volume" value="96" />
         <ctl name="ADC MUX7" value="DMIC" />
-        <ctl name="DMIC MUX7" value="DMIC0" />
+        <ctl name="DMIC MUX7" value="DMIC4" />
         <ctl name="SLIM TX8 MUX" value="DEC8" />
+        <ctl name="DEC8 Volume" value="96" />
         <ctl name="ADC MUX8" value="DMIC" />
-        <ctl name="DMIC MUX8" value="DMIC2" />
+        <ctl name="DMIC MUX8" value="DMIC0" />
         <ctl name="SLIM_0_TX Channels" value="Two" />
     </path>
     <!-- MM-JohnHCChiang-Change audio path id-00+} -->
