@@ -66,7 +66,7 @@ on property:vendor.wifi.ommtu=true
    write /sys/class/net/wlan0/mtu 1390
 
 on property:ro.boot.simslot=1
-    setprop persist.radio.multisim.config ss
+    setprop persist.radio.multisim.config ssss
 
 on property:ro.boot.simslot=2
     setprop persist.radio.multisim.config dsds
