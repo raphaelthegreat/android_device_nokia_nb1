@@ -34,15 +34,23 @@ vendor/firmware/TP_Firmware_JDI
 vendor/firmware/TP_Firmware_LG4946
 
 # Camera HAL
+vendor/lib/hw/camera.msm8998.so
+vendor/lib/libarcsoft_beautyshot.so
+vendor/lib/libarcsoft_beautyshot_video_algorithm.so
 vendor/lib/libdepthmapwrapper.so
+vendor/lib/libhal_dbg.so
 vendor/lib/libflash_pmic.so
 vendor/lib/libjpegdhw.so
 vendor/lib/libjpegdmahw.so
 vendor/lib/libjpegehw.so
+vendor/lib/libmmcamera_interface.so
+vendor/lib/libmmjpeg_interface.so
+vendor/lib/libmmlib2d_interface.so
 vendor/lib/libmmjpeg.so
 vendor/lib/libmmqjpegdma.so
 vendor/lib/libmmqjpeg_codec.so
 vendor/lib/libmpbase.so
+vendor/lib/libqomx_core.so
 vendor/lib/libqomx_jpegdec.so
 vendor/lib/libqomx_jpegenc.so
 vendor/lib/libqomx_jpegenc_pipe.so
@@ -66,12 +74,6 @@ vendor/lib/libmmcamera_hvx_add_constant.so
 vendor/lib/libmmcamera_hvx_grid_sum.so
 vendor/lib/libmmcamera_imglib.so
 vendor/lib/libmmcamera_imglib_faceproc_adspstub.so
-vendor/lib/libmmcamera_imx362_gt24c64a.so
-vendor/lib/libmmcamera_irs1645.so
-vendor/lib/libmmcamera_ov13850_q13v06k.so
-vendor/lib/libmmcamera_ov2685_scv3b4035.so
-vendor/lib/libmmcamera_ov8856_2lane.so
-vendor/lib/libmmcamera_ov8856_4lane.so
 vendor/lib/libmmcamera_paaf_lib.so
 vendor/lib/libmmcamera_pdaf.so
 vendor/lib/libmmcamera_pdafcamif.so
@@ -99,7 +101,6 @@ vendor/lib/libmmcamera2_sensor_modules.so
 vendor/lib/libmmcamera2_stats_algorithm.so
 vendor/lib/libmmcamera2_stats_lib.so
 vendor/lib/libmmcamera2_stats_modules.so
-
 vendor/lib64/libmmcamera_dbg.so
 vendor/lib64/libmmcamera_faceproc.so
 vendor/lib64/libmmcamera_faceproc2.so
@@ -112,30 +113,11 @@ vendor/lib64/libmmcamera2_stats_algorithm.so
 vendor/lib64/libmmcamera2_stats_lib.so
 
 # Camera actuators
-vendor/lib/libactuator_ad5816g.so
-vendor/lib/libactuator_ad5823.so
-vendor/lib/libactuator_ak7345.so
 vendor/lib/libactuator_ak7371.so
 vendor/lib/libactuator_ak7371_color_fih.so
 vendor/lib/libactuator_ak7371_mono_fih.so
-vendor/lib/libactuator_ak7371_tele_a1n.so
-vendor/lib/libactuator_ak7371_wide_a1n.so
-vendor/lib/libactuator_bu64244gwz.so
-vendor/lib/libactuator_bu64297.so
 vendor/lib/libactuator_dw9714.so
 vendor/lib/libactuator_dw9714_front_fih.so
-vendor/lib/libactuator_dw9716.so
-vendor/lib/libactuator_dw9761b.so
-vendor/lib/libactuator_dw9763.so
-vendor/lib/libactuator_dw9763b.so
-vendor/lib/libactuator_dw9790a.so
-vendor/lib/libactuator_dw9800.so
-vendor/lib/libactuator_lc898122.so
-vendor/lib/libactuator_lc898212xd.so
-vendor/lib/libactuator_lc898212xd_qc2002.so
-vendor/lib/libactuator_lc898217xc.so
-vendor/lib/libactuator_pseudo.so
-vendor/lib/libactuator_rohm_bu64243gwz.so
 vendor/lib/libactuator_single_ak7371_mono_fih.so
 
 # Camera OIS
@@ -148,11 +130,8 @@ vendor/etc/camera/camera_config.xml
 vendor/etc/camera/csidtg_camera.xml
 vendor/etc/camera/csidtg_chromatix.xml
 vendor/etc/camera/imx258_color_nb1_chromatix.xml
-vendor/etc/camera/imx258_front_nb1_chromatix.xml
 vendor/etc/camera/imx258_mono_nb1_chromatix.xml
-vendor/etc/camera/s5k2l7sa05_a1n_wide_chromatix.xml
 vendor/etc/camera/s5k3l8_front_nb1_chromatix.xml
-vendor/etc/camera/s5k3m3sm_a1n_tele_chromatix.xml
 
 # Camera chromatix
 vendor/lib/libchromatix_csidtg_common.so
@@ -190,36 +169,6 @@ vendor/lib/libchromatix_imx258_color_nb1_versions.so
 vendor/lib/libchromatix_imx258_color_nb1_video_4k.so
 vendor/lib/libchromatix_imx258_color_nb1_zsl_preview_3a.so
 vendor/lib/libchromatix_imx258_color_nb1_zsl_video_3a.so
-
-vendor/lib/libchromatix_imx258_front_nb1_4k_preview_3a.so
-vendor/lib/libchromatix_imx258_front_nb1_4k_video_3a.so
-vendor/lib/libchromatix_imx258_front_nb1_common.so
-vendor/lib/libchromatix_imx258_front_nb1_cpp_hfr_120.so
-vendor/lib/libchromatix_imx258_front_nb1_cpp_hfr_60.so
-vendor/lib/libchromatix_imx258_front_nb1_cpp_hfr_90.so
-vendor/lib/libchromatix_imx258_front_nb1_cpp_liveshot.so
-vendor/lib/libchromatix_imx258_front_nb1_cpp_preview.so
-vendor/lib/libchromatix_imx258_front_nb1_cpp_snapshot.so
-vendor/lib/libchromatix_imx258_front_nb1_cpp_video.so
-vendor/lib/libchromatix_imx258_front_nb1_cpp_video_4k.so
-vendor/lib/libchromatix_imx258_front_nb1_default_preview_3a.so
-vendor/lib/libchromatix_imx258_front_nb1_default_video.so
-vendor/lib/libchromatix_imx258_front_nb1_default_video_3a.so
-vendor/lib/libchromatix_imx258_front_nb1_hfr_120.so
-vendor/lib/libchromatix_imx258_front_nb1_hfr_120_3a.so
-vendor/lib/libchromatix_imx258_front_nb1_hfr_60.so
-vendor/lib/libchromatix_imx258_front_nb1_hfr_60_3a.so
-vendor/lib/libchromatix_imx258_front_nb1_hfr_90.so
-vendor/lib/libchromatix_imx258_front_nb1_hfr_90_3a.so
-vendor/lib/libchromatix_imx258_front_nb1_liveshot.so
-vendor/lib/libchromatix_imx258_front_nb1_postproc.so
-vendor/lib/libchromatix_imx258_front_nb1_preview.so
-vendor/lib/libchromatix_imx258_front_nb1_snapshot.so
-vendor/lib/libchromatix_imx258_front_nb1_versions.so
-vendor/lib/libchromatix_imx258_front_nb1_video_4k.so
-vendor/lib/libchromatix_imx258_front_nb1_zsl_preview_3a.so
-vendor/lib/libchromatix_imx258_front_nb1_zsl_video_3a.so
-
 vendor/lib/libchromatix_imx258_mono_nb1_4k_preview_3a.so
 vendor/lib/libchromatix_imx258_mono_nb1_4k_video_3a.so
 vendor/lib/libchromatix_imx258_mono_nb1_common.so
@@ -248,7 +197,6 @@ vendor/lib/libchromatix_imx258_mono_nb1_versions.so
 vendor/lib/libchromatix_imx258_mono_nb1_video_4k.so
 vendor/lib/libchromatix_imx258_mono_nb1_zsl_preview_3a.so
 vendor/lib/libchromatix_imx258_mono_nb1_zsl_video_3a.so
-
 vendor/lib/libchromatix_imx258_single_mono_nb1_4k_preview_3a.so
 vendor/lib/libchromatix_imx258_single_mono_nb1_4k_video_3a.so
 vendor/lib/libchromatix_imx258_single_mono_nb1_common.so
@@ -277,7 +225,6 @@ vendor/lib/libchromatix_imx258_single_mono_nb1_versions.so
 vendor/lib/libchromatix_imx258_single_mono_nb1_video_4k.so
 vendor/lib/libchromatix_imx258_single_mono_nb1_zsl_preview_3a.so
 vendor/lib/libchromatix_imx258_single_mono_nb1_zsl_video_3a.so
-
 vendor/lib/libchromatix_s5k3l8_front_nb1_4k_preview_3a.so
 vendor/lib/libchromatix_s5k3l8_front_nb1_4k_video_3a.so
 vendor/lib/libchromatix_s5k3l8_front_nb1_common.so
@@ -310,37 +257,9 @@ vendor/lib/libchromatix_s5k3l8_front_nb1_zsl_video_3a.so
 
 # Camera eeprom
 vendor/lib/libmmcamera_eeprom_util.so
-vendor/lib/libmmcamera_sony_imx298_eeprom.so
-vendor/lib/libmmcamera_sony_imx378_eeprom.so
-vendor/lib/libmmcamera_sonyimx135_eeprom.so
-vendor/lib/libmmcamera_sunny_8865_eeprom.so
-vendor/lib/libmmcamera_sunny_gt24c64_imx298_eeprom.so
-vendor/lib/libmmcamera_sunny_gt24c64_s5k2l7_eeprom.so
-vendor/lib/libmmcamera_sunny_gt24c64_s5k2l7sx_eeprom.so
-vendor/lib/libmmcamera_sunny_gt24c64a_imx362_eeprom.so
-vendor/lib/libmmcamera_sunny_gt24c64a_imx376_eeprom.so
-vendor/lib/libmmcamera_sunny_ov13855_eeprom.so
-vendor/lib/libmmcamera_sunny_q13v06k_eeprom.so
-vendor/lib/libmmcamera_sunny_q5v41b_eeprom.so
-vendor/lib/libmmcamera_rohm_brcg064gwz_3_eeprom.so
-vendor/lib/libmmcamera_qtech_f3l8yam_eeprom.so
-vendor/lib/libmmcamera_qtech_f5670bq_eeprom.so
-vendor/lib/libmmcamera_le2464c_eeprom.so
-vendor/lib/libmmcamera_le2464c_master_eeprom.so
-vendor/lib/libmmcamera_m24c64s_eeprom.so
-vendor/lib/libmmcamera_ofilm_ohs0443_ov12a10_eeprom.so
-vendor/lib/libmmcamera_ofilm_ohs0443_ov13880_eeprom.so
 vendor/lib/libmmcamera_ohp0497_eeprom.so
-vendor/lib/libmmcamera_onsemi_cat24c16_eeprom.so
-vendor/lib/libmmcamera_onsemi_cat24c32_eeprom.so
-vendor/lib/libmmcamera_onsemi_cat24c32_imx362_eeprom.so
-vendor/lib/libmmcamera_imx258_at24c64d_front_fih_eeprom.so
-vendor/lib/libmmcamera_dw9761b_2d_eeprom.so
-vendor/lib/libmmcamera_atmel_at24c32e_eeprom.so
 vendor/lib/libmmcamera_cat24c64_MONO_eeprom.so
 vendor/lib/libmmcamera_cat24c64_RGB_eeprom.so
-vendor/lib/libmmcamera_truly_cma481_eeprom.so
-vendor/lib/libmmcamera_truly_cmb433_eeprom.so
 
 # Camera firmware
 vendor/firmware/cpp_firmware_v1_1_1.fw
@@ -357,24 +276,10 @@ vendor/firmware/cpp_firmware_v1_12_0.fw
 
 # Camera sensors
 vendor/lib/libmmcamera_imx258_color_fih.so
-vendor/lib/libmmcamera_imx258_front_fih.so
 vendor/lib/libmmcamera_imx258_mono_fih.so
-vendor/lib/libmmcamera_imx298.so
-vendor/lib/libmmcamera_imx318.so
-vendor/lib/libmmcamera_imx362.so
-vendor/lib/libmmcamera_imx376.so
-vendor/lib/libmmcamera_imx378.so
-vendor/lib/libmmcamera_s5k2l7.so
-vendor/lib/libmmcamera_s5k2l7sx.so
 vendor/lib/libmmcamera_s5k3l8.so
 vendor/lib/libmmcamera_s5k3l8_mono.so
 vendor/lib/libmmcamera_s5k3l8_nb1.so
-vendor/lib/libmmcamera_s5k3m2xm.so
-vendor/lib/libmmcamera_s5k3m2xx.so
-vendor/lib/libmmcamera_s5k3m3sm.so
-vendor/lib/libmmcamera_s5k3p3sm.so
-vendor/lib/libmmcamera_s5k3p8sp.so
-
 
 # Camera ISP
 vendor/lib/libmmcamera2_isp_modules.so

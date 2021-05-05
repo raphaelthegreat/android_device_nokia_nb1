@@ -30,13 +30,6 @@ DEVICE_PACKAGE_OVERLAYS += \
     $(LOCAL_PATH)/overlay \
     $(LOCAL_PATH)/overlay-lineage
 
-# Camera
-PRODUCT_PACKAGES += \
-    camera.msm8998 \
-    libmm-qcamera \
-    mm-qcamera-app \
-    libhal_dbg
-
 # Fingerprint
 PRODUCT_PACKAGES += \
     android.hardware.biometrics.fingerprint@2.1-service.nokia_nb1 \
