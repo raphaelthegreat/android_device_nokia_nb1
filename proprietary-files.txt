@@ -1,6 +1,10 @@
 ## NB1 proprietary files
 ## From Nokia/NB1_00WW_FIH/NB1:9/PPR1.180610.011/00WW_5_15J:user/release-keys unless pinned
 
+# Audio HAL
+vendor/lib/hw/audio.primary.msm8998.so
+vendor/lib64/hw/audio.primary.msm8998.so
+
 # Audio amplifer TAS2555
 etc/firmware/tfa98xx.cnt:vendor/firmware/tfa98xx.cnt
 etc/firmware/tfa98xxEVT.cnt:vendor/firmware/tfa98xxEVT.cnt
