@@ -4,7 +4,8 @@ on init
     setprop ro.led.status 0
 
 on early-boot
-    rm /persist/bluetooth/.bt_nv.bin
+    rm /mnt/vendor/persist/bluetooth/.bt_nv.bin
+    rm /mnt/vendor/persist/sensors/sns.reg
 
 # msm specific files that need to be created on /data
 on post-fs-data
