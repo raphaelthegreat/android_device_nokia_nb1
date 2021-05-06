@@ -12,6 +12,19 @@ function blob_fixup() {
             "${PATCHELF}" --add-needed "libprocessgroup.so" "${2}"
             "${PATCHELF}" --replace-needed "libtinycompress_vendor.so" "libtinycompress.so" "${2}"
             ;;
+            # Patch blobs for VNDK
+        vendor/bin/gx_fpd)
+            "${PATCHELF}" --replace-needed "libunwind.so" "libunwind-vendor.so" "${2}" 
+            "${PATCHELF}" --replace-needed "libbacktrace.so" "libbacktrace-vendor.so" "${2}"
+            "${PATCHELF}" --add-needed "liblog.so" "${2}"
+            ;;
+        vendor/lib64/hw/gxfingerprint.default.so)
+            # Hexedit gxfingerprint to load goodix firmware from /vendor/firmware/
+            sed -i -e 's|/system/etc/firmware|/vendor/firmware\x0\x0\x0\x0|g' "${2}"
+            ;;
+        vendor/lib/hw/camera.msm8998.so)
+            "${PATCHELF}" --replace-needed "libgui.so" "libgui_vendor.so" "${2}"
+            ;;
     esac
 }
 
