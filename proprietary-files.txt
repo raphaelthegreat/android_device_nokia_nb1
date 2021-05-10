@@ -3,7 +3,11 @@
 
 # Audio HAL
 vendor/lib/hw/audio.primary.msm8998.so
+vendor/lib/libtinycompress_vendor.so
+vendor/lib/libaudio_log_utils.so
 vendor/lib64/hw/audio.primary.msm8998.so
+vendor/lib64/libtinycompress_vendor.so
+vendor/lib64/libaudio_log_utils.so
 
 # Audio amplifer TAS2555
 etc/firmware/tfa98xx.cnt:vendor/firmware/tfa98xx.cnt
