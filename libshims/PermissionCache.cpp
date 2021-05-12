@@ -13,5 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <stdint.h>
 
-extern "C" void _ZN7android22checkCallingPermissionERKNS_8String16E() {}
+namespace android {
+    extern "C" void _ZN7android22checkCallingPermissionERKNS_8String16E() {}
+}
