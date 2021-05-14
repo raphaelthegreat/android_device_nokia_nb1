@@ -32,9 +32,7 @@ DEVICE_PACKAGE_OVERLAYS += \
 
 # Fingerprint
 PRODUCT_PACKAGES += \
-    android.hardware.biometrics.fingerprint@2.1-service.nokia_nb1 \
-    libunwind-vendor \
-    libbacktrace-vendor
+    android.hardware.biometrics.fingerprint@2.1-service.nokia_nb1
 
 # Keylayout
 PRODUCT_COPY_FILES += \

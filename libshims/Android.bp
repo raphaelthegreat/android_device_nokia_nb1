@@ -33,18 +33,3 @@ cc_library_shared {
         "DisplayEventReceiver.cpp",
     ],
 }
-
-// System libs for gx_fpd
-cc_library_shared {
-    name: "libunwind-vendor",
-    vendor: true,
-    defaults: ["hidl_defaults"],
-    static_libs: ["libunwind"]
-}
-
-cc_library_shared {
-    name: "libbacktrace-vendor",
-    vendor: true,
-    defaults: ["hidl_defaults"],
-    static_libs: ["libbacktrace"]
-}
