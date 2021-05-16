@@ -40,7 +40,7 @@ TARGET_KERNEL_VERSION := 4.4
 # Shims
 TARGET_LD_SHIM_LIBS := \
    /vendor/lib64/libfpservice.so|libshim_binder.so \
-   /vendor/lib/hw/camera.msm8998.so|libshim_camera.so
+   /vendor/lib/hw/camera.msm8998.so|libshim_gui.so
 
 # Partitions
 BOARD_BOOTIMAGE_PARTITION_SIZE := 67108864

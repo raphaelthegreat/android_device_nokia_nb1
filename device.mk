@@ -46,8 +46,8 @@ PRODUCT_COPY_FILES += \
 
 # Shims
 PRODUCT_PACKAGES += \
-    libshims_gxfpd \
-    libshims_camera
+    libshim_binder \
+    libshim_gui
 
 # Ramdisk
 PRODUCT_PACKAGES += \
