@@ -1,0 +1,2 @@
+allow sensors proc_fih:file r_file_perms;
+allow sensors proc_fih:dir r_dir_perms;

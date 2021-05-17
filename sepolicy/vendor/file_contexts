@@ -1,0 +1,7 @@
+# Goodix Fingerprint
+/dev/goodix_fp		                u:object_r:gx_fpd_device:s0
+/data/system/fingerprint(/.*)?      u:object_r:gx_fpd_data_file:s0
+/vendor/bin/gx_fpd                  u:object_r:gx_fpd_exec:s0
+
+# HALs
+/vendor/bin/hw/android\.hardware\.biometrics\.fingerprint@2\.1-service\.nokia_nb1		u:object_r:hal_fingerprint_default_exec:s0
