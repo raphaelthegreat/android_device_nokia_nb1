@@ -14,10 +14,10 @@
 # limitations under the License.
 #
 
-LOCAL_PATH := device/nokia/ΝΒ1
-
 # Inherit from nokia msm8998-common
--include device/nokia/msm8998-common/BoardConfigCommon.mk
+include device/nokia/msm8998-common/BoardConfigCommon.mk
+
+LOCAL_PATH := device/nokia/ΝΒ1
 
 # Platform
 TARGET_BOARD_PLATFORM := msm8998
