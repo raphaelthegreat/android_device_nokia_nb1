@@ -52,7 +52,9 @@ PRODUCT_PACKAGES += \
 
 # Ramdisk
 PRODUCT_PACKAGES += \
+    init.nb1.camera.rc \
     init.nb1.fingerprint.rc \
+    init.nb1.poweroff_charging.rc \
     init.nb1.target.rc
 
 # Get non-open-source specific aspects
