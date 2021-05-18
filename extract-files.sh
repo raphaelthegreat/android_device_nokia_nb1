@@ -17,6 +17,7 @@ function blob_fixup() {
             "${PATCHELF}" --remove-needed "libunwind.so" "${2}" 
             "${PATCHELF}" --remove-needed "libbacktrace.so" "${2}"
             "${PATCHELF}" --add-needed "liblog.so" "${2}"
+            "${PATCHELF}" --add-needed "libshim_binder.so" "${2}"
             ;;
         # Hexedit gxfingerprint to load goodix firmware from /vendor/firmware/
         vendor/lib64/hw/gxfingerprint.default.so)
@@ -26,10 +27,6 @@ function blob_fixup() {
         vendor/lib/hw/camera.msm8998.so)
             "${PATCHELF}" --replace-needed "libgui.so" "libgui_vendor.so" "${2}"
             "${PATCHELF}" --add-needed "libshim_gui.so" "${2}"
-            ;;
-        # Add shim to libfpservice
-        vendor/lib64/libfpservice.so)
-            "${PATCHELF}" --add-needed "libshim_binder.so" "${2}"
             ;;
     esac
 }
