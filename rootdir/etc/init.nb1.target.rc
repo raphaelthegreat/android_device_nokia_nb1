@@ -37,6 +37,9 @@ on post-fs-data
     mkdir /data/nfc
     mkdir /etc/param
 
+    # Create touch dir
+    mkdir /data/vendor/misc/touch 0770 system system
+
 on early-boot
     rm /mnt/vendor/persist/bluetooth/.bt_nv.bin
     rm /mnt/vendor/persist/sensors/sns.reg
@@ -53,6 +56,46 @@ on boot
     # Diable thermal balance and CTM(Connect Temperature Monitor)
     setprop persist.therm_bal.disallowed 1
     setprop persist.ctm.disallowed 1
+
+    # Set panel permissions
+    chown system system /proc/AllHWList/LCM0
+	chown system system /proc/AllHWList/LCM0/AOD
+	chown system system /proc/AllHWList/LCM0/PanelID
+	chown system system /proc/AllHWList/LCM0/setlp
+	chown system system /proc/AllHWList/LCM0/glance
+    chown system system /proc/AllHWList/LCM0/awer_cnt
+	chown system system /proc/AllHWList/LCM0/awer_status
+    chown system system /sys/class/graphics/fb0/blank
+	
+    chmod 777 /proc/AllHWList/LCM0
+	chmod 664 /proc/AllHWList/LCM0/AOD
+	chmod 644 /proc/AllHWList/LCM0/PanelID
+	chmod 664 /proc/AllHWList/LCM0/setlp
+	chmod 664 /proc/AllHWList/LCM0/glance
+	chmod 664 /proc/AllHWList/LCM0/awer_cnt
+	chmod 664 /proc/AllHWList/LCM0/awer_status
+
+    # Set touch permissions
+    chown system system /proc/AllHWList/tp_self_test
+    chown system system /proc/AllHWList/tp_self_test_U0
+    chown system system /proc/AllHWList/tp_upgrade
+    chown system system /proc/AllHWList/tp_alt_rst
+    chown system system /proc/AllHWList/tp_alt_st_count
+    chown system system /proc/AllHWList/tp_alt_st_enable
+    chown system system /proc/AllHWList/tp_double_tap
+    chown system system /proc/AllHWList/tp_prox_status
+    chown system system /sys/devices/virtual/input/siw_touch_input/lpwg_notify
+    chown system system /sys/devices/virtual/input/siw_touch_input/glove_status
+    
+    chmod 644 /proc/AllHWList/tp_self_test 
+    chmod 644 /proc/AllHWList/tp_self_test_U0 
+    chmod 444 /proc/AllHWList/tp_fw_ver 
+    chmod 644 /proc/AllHWList/tp_upgrade
+    chmod 644 /proc/AllHWList/tp_alt_rst
+    chmod 644 /proc/AllHWList/tp_alt_st_count
+    chmod 644 /proc/AllHWList/tp_alt_st_enable
+    chmod 644 /proc/AllHWList/tp_double_tap
+    chmod 644 /proc/AllHWList/tp_prox_status
 
 # Dual SIM
 on property:ro.boot.simslot=1
