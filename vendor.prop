@@ -22,7 +22,7 @@ ro.vendor.qti.sys.fw.bg_apps_limit=15
 ro.vendor.qti.config.zram=true
 
 # Sensors
-ro.vendor.sensors.dev_ori=false
+ro.vendor.sensors.dev_ori=true
 ro.vendor.sensors.pmd=true
 ro.vendor.sensors.sta_detect=true
 ro.vendor.sensors.mot_detect=true
