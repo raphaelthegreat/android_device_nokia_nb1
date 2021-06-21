@@ -90,10 +90,3 @@ on boot
     chmod 644 /proc/AllHWList/tp_alt_st_enable
     chmod 644 /proc/AllHWList/tp_double_tap
     chmod 644 /proc/AllHWList/tp_prox_status
-
-# Dual SIM
-on property:ro.boot.simslot=1
-    setprop persist.radio.multisim.config ssss
-
-on property:ro.boot.simslot=2
-    setprop persist.radio.multisim.config dsds
