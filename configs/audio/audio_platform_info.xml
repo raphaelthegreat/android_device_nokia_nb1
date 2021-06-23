@@ -41,7 +41,7 @@
         <device name="SND_DEVICE_IN_CAPTURE_VI_FEEDBACK_MONO_1" acdb_id="151"/>
         <device name="SND_DEVICE_IN_CAPTURE_VI_FEEDBACK_MONO_2" acdb_id="152"/>
         <!-- MM-JohnHCChiang-VOIP audio path-00+{ -->
-        <device name="SND_DEVICE_IN_HANDSET_VOIP_DMIC" acdb_id="111"/>
+        <device name="SND_DEVICE_IN_HANDSET_VOIP_DMIC" acdb_id="34"/>
         <!-- MM-JohnHCChiang-VOIP audio path-00+} -->
         <device name="SND_DEVICE_IN_VOICE_REC_MIC" acdb_id="104"/>
         <device name="SND_DEVICE_IN_UNPROCESSED_MIC" acdb_id="143"/>
