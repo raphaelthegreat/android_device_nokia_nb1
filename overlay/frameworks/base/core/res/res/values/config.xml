@@ -17,6 +17,13 @@
 <!-- These resources are around just to allow their values to be customized
      for different hardware and product builds.  Do not translate. -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+     <!-- Allow automatic adjusting of the screen brightness while dozing in low power state. -->
+     <bool name="config_allowAutoBrightnessWhileDozing">false</bool>
+    
+     <!-- Flag indicating whether we should enable the automatic brightness in Settings.
+         config_hardware_automatic_brightness_available is not set, so we will use software implementation -->
+     <bool name="config_automatic_brightness_available">true</bool>
+     
      <!-- Array of light sensor LUX values to define our levels for auto backlight brightness support.
          The N entries of this array define N  1 zones as follows:
 
