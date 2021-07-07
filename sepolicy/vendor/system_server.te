@@ -1,0 +1,2 @@
+# Sensors
+allow system_server proc_fih:dir search;
