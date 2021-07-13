@@ -1,9 +1,17 @@
 ## NB1 proprietary files
 ## From Nokia/NB1_00WW_FIH/NB1:9/PPR1.180610.011/00WW_5_16A:user/release-keys unless pinned
 
+# Audio HAL
+vendor/lib/hw/audio.primary.msm8998.so
+vendor/lib/libtinycompress_vendor.so
+vendor/lib/libaudio_log_utils.so
+vendor/lib64/hw/audio.primary.msm8998.so
+vendor/lib64/libtinycompress_vendor.so
+vendor/lib64/libaudio_log_utils.so
+
 # Audio amplifer TAS2555
-system/etc/firmware/tfa98xx.cnt:vendor/firmware/tfa98xx.cnt
-system/etc/firmware/tfa98xxEVT.cnt:vendor/firmware/tfa98xxEVT.cnt
+etc/firmware/tfa98xx.cnt:vendor/firmware/tfa98xx.cnt
+etc/firmware/tfa98xxEVT.cnt:vendor/firmware/tfa98xxEVT.cnt
 
 # Audio ACDB
 vendor/etc/acdbdata/NB1/Bluetooth_cal.acdb
@@ -328,6 +336,17 @@ vendor/lib/libmmcamera_isp_sce40.so
 vendor/lib/libmmcamera_isp_snr47.so
 vendor/lib/libmmcamera_isp_sub_module.so
 
+# DRM (Firmware)
+etc/firmware/cppf.b00:vendor/firmware/cppf.b00
+etc/firmware/cppf.b01:vendor/firmware/cppf.b02
+etc/firmware/cppf.b02:vendor/firmware/cppf.b03
+etc/firmware/cppf.b03:vendor/firmware/cppf.b04
+etc/firmware/cppf.b04:vendor/firmware/cppf.b05
+etc/firmware/cppf.b05:vendor/firmware/cppf.b06
+etc/firmware/cppf.b06:vendor/firmware/cppf.b07
+etc/firmware/cppf.b07:vendor/firmware/cppf.b01
+etc/firmware/cppf.mdt:vendor/firmware/cppf.mdt
+
 # Fingerprint sensor
 vendor/bin/gx_fpd
 vendor/bin/gx_fpcmd
@@ -340,24 +359,24 @@ vendor/lib64/libqfp-service.so
 vendor/lib64/hw/fingerprint.default.so:vendor/lib64/hw/fingerprint.msm8998.so
 
 # Fingerprint (Firmware)
-system/etc/firmware/goodixfp.b00:vendor/firmware/goodixfp.b00
-system/etc/firmware/goodixfp.b01:vendor/firmware/goodixfp.b01
-system/etc/firmware/goodixfp.b02:vendor/firmware/goodixfp.b02
-system/etc/firmware/goodixfp.b03:vendor/firmware/goodixfp.b03
-system/etc/firmware/goodixfp.b04:vendor/firmware/goodixfp.b04
-system/etc/firmware/goodixfp.b05:vendor/firmware/goodixfp.b05
-system/etc/firmware/goodixfp.b06:vendor/firmware/goodixfp.b06
-system/etc/firmware/goodixfp.b07:vendor/firmware/goodixfp.b07
-system/etc/firmware/goodixfp.mdt:vendor/firmware/goodixfp.mdt
-system/etc/firmware/goodixfplv.b00:vendor/firmware/goodixfplv.b00
-system/etc/firmware/goodixfplv.b01:vendor/firmware/goodixfplv.b01
-system/etc/firmware/goodixfplv.b02:vendor/firmware/goodixfplv.b02
-system/etc/firmware/goodixfplv.b03:vendor/firmware/goodixfplv.b03
-system/etc/firmware/goodixfplv.b04:vendor/firmware/goodixfplv.b04
-system/etc/firmware/goodixfplv.b05:vendor/firmware/goodixfplv.b05
-system/etc/firmware/goodixfplv.b06:vendor/firmware/goodixfplv.b06
-system/etc/firmware/goodixfplv.b07:vendor/firmware/goodixfplv.b07
-system/etc/firmware/goodixfplv.mdt:vendor/firmware/goodixfplv.mdt
+etc/firmware/goodixfp.b00:vendor/firmware/goodixfp.b00
+etc/firmware/goodixfp.b01:vendor/firmware/goodixfp.b01
+etc/firmware/goodixfp.b02:vendor/firmware/goodixfp.b02
+etc/firmware/goodixfp.b03:vendor/firmware/goodixfp.b03
+etc/firmware/goodixfp.b04:vendor/firmware/goodixfp.b04
+etc/firmware/goodixfp.b05:vendor/firmware/goodixfp.b05
+etc/firmware/goodixfp.b06:vendor/firmware/goodixfp.b06
+etc/firmware/goodixfp.b07:vendor/firmware/goodixfp.b07
+etc/firmware/goodixfp.mdt:vendor/firmware/goodixfp.mdt
+etc/firmware/goodixfplv.b00:vendor/firmware/goodixfplv.b00
+etc/firmware/goodixfplv.b01:vendor/firmware/goodixfplv.b01
+etc/firmware/goodixfplv.b02:vendor/firmware/goodixfplv.b02
+etc/firmware/goodixfplv.b03:vendor/firmware/goodixfplv.b03
+etc/firmware/goodixfplv.b04:vendor/firmware/goodixfplv.b04
+etc/firmware/goodixfplv.b05:vendor/firmware/goodixfplv.b05
+etc/firmware/goodixfplv.b06:vendor/firmware/goodixfplv.b06
+etc/firmware/goodixfplv.b07:vendor/firmware/goodixfplv.b07
+etc/firmware/goodixfplv.mdt:vendor/firmware/goodixfplv.mdt
 
 # IPA
 vendor/firmware/ipa_fws.b00

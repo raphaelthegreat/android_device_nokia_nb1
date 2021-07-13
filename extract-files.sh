@@ -9,6 +9,9 @@
 function blob_fixup() {
     case "${1}" in
         ## NB1 Patches
+        vendor/lib/hw/audio.primary.msm8998.so|vendor/lib64/hw/audio.primary.msm8998.so)
+            "${PATCHELF}" --replace-needed "libcutils.so" "libprocessgroup.so" "${2}"
+            ;;
         # Patch gx_fpd for VNDK support
         vendor/bin/gx_fpd)
             "${PATCHELF}" --remove-needed "libunwind.so" "${2}" 
