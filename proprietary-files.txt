@@ -119,8 +119,13 @@ vendor/lib64/libmmcamera2_is.so
 vendor/lib64/libmmcamera2_q3a_core.so
 vendor/lib64/libmmcamera2_stats_algorithm.so
 vendor/lib64/libmmcamera2_stats_lib.so
+vendor/lib/libmmcamera_imx258_color_fih.so
+vendor/lib/libmmcamera_imx258_mono_fih.so
+vendor/lib/libmmcamera_s5k3l8.so
+vendor/lib/libmmcamera_s5k3l8_mono.so
+vendor/lib/libmmcamera_s5k3l8_nb1.so
 
-# Camera actuators
+# Camera (Actuators)
 vendor/lib/libactuator_ak7371.so
 vendor/lib/libactuator_ak7371_color_fih.so
 vendor/lib/libactuator_ak7371_mono_fih.so
@@ -128,12 +133,12 @@ vendor/lib/libactuator_dw9714.so
 vendor/lib/libactuator_dw9714_front_fih.so
 vendor/lib/libactuator_single_ak7371_mono_fih.so
 
-# Camera OIS
+# Camera (OIS)
 vendor/lib/libois_bu24218.so
 vendor/lib/libois_bu63165.so
 vendor/lib/libois_lc898122.so
 
-# Camera configs
+# Camera (Configs)
 vendor/etc/camera/camera_config.xml
 vendor/etc/camera/csidtg_camera.xml
 vendor/etc/camera/csidtg_chromatix.xml
@@ -141,7 +146,7 @@ vendor/etc/camera/imx258_color_nb1_chromatix.xml
 vendor/etc/camera/imx258_mono_nb1_chromatix.xml
 vendor/etc/camera/s5k3l8_front_nb1_chromatix.xml
 
-# Camera chromatix
+# Camera (Chromatix)
 vendor/lib/libchromatix_csidtg_common.so
 vendor/lib/libchromatix_csidtg_cpp_preview.so
 vendor/lib/libchromatix_csidtg_postproc.so
@@ -263,33 +268,16 @@ vendor/lib/libchromatix_s5k3l8_front_nb1_video_4k.so
 vendor/lib/libchromatix_s5k3l8_front_nb1_zsl_preview_3a.so
 vendor/lib/libchromatix_s5k3l8_front_nb1_zsl_video_3a.so
 
-# Camera eeprom
+# Camera (Eeprom)
 vendor/lib/libmmcamera_eeprom_util.so
 vendor/lib/libmmcamera_ohp0497_eeprom.so
 vendor/lib/libmmcamera_cat24c64_MONO_eeprom.so
 vendor/lib/libmmcamera_cat24c64_RGB_eeprom.so
 
-# Camera firmware
-vendor/firmware/cpp_firmware_v1_1_1.fw
-vendor/firmware/cpp_firmware_v1_1_6.fw
-vendor/firmware/cpp_firmware_v1_2_0.fw
-vendor/firmware/cpp_firmware_v1_4_0.fw
-vendor/firmware/cpp_firmware_v1_5_0.fw
-vendor/firmware/cpp_firmware_v1_5_1.fw
-vendor/firmware/cpp_firmware_v1_5_2.fw
-vendor/firmware/cpp_firmware_v1_6_0.fw
-vendor/firmware/cpp_firmware_v1_8_0.fw
-vendor/firmware/cpp_firmware_v1_10_0.fw
+# Camera (Firmware)
 vendor/firmware/cpp_firmware_v1_12_0.fw
 
-# Camera sensors
-vendor/lib/libmmcamera_imx258_color_fih.so
-vendor/lib/libmmcamera_imx258_mono_fih.so
-vendor/lib/libmmcamera_s5k3l8.so
-vendor/lib/libmmcamera_s5k3l8_mono.so
-vendor/lib/libmmcamera_s5k3l8_nb1.so
-
-# Camera ISP
+# Camera (ISP)
 vendor/lib/libmmcamera2_isp_modules.so
 vendor/lib/libmmcamera_isp_abf48.so
 vendor/lib/libmmcamera_isp_aec_bg_stats47.so
