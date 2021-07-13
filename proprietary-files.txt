@@ -336,17 +336,6 @@ vendor/lib/libmmcamera_isp_sce40.so
 vendor/lib/libmmcamera_isp_snr47.so
 vendor/lib/libmmcamera_isp_sub_module.so
 
-# DRM (Firmware)
-etc/firmware/cppf.b00:vendor/firmware/cppf.b00
-etc/firmware/cppf.b01:vendor/firmware/cppf.b02
-etc/firmware/cppf.b02:vendor/firmware/cppf.b03
-etc/firmware/cppf.b03:vendor/firmware/cppf.b04
-etc/firmware/cppf.b04:vendor/firmware/cppf.b05
-etc/firmware/cppf.b05:vendor/firmware/cppf.b06
-etc/firmware/cppf.b06:vendor/firmware/cppf.b07
-etc/firmware/cppf.b07:vendor/firmware/cppf.b01
-etc/firmware/cppf.mdt:vendor/firmware/cppf.mdt
-
 # Fingerprint sensor
 vendor/bin/gx_fpd
 vendor/bin/gx_fpcmd
