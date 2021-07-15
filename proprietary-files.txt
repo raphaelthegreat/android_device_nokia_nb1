@@ -120,6 +120,7 @@ vendor/lib64/libmmcamera2_q3a_core.so
 vendor/lib64/libmmcamera2_stats_algorithm.so
 vendor/lib64/libmmcamera2_stats_lib.so
 vendor/lib/libmmcamera_imx258_color_fih.so
+vendor/lib/libmmcamera_imx258_front_fih.so
 vendor/lib/libmmcamera_imx258_mono_fih.so
 vendor/lib/libmmcamera_s5k3l8.so
 vendor/lib/libmmcamera_s5k3l8_mono.so
